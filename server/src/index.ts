@@ -16,7 +16,13 @@ import instructorRoutes from './routes/instructor';
 const app = express();
 const PORT = process.env.PORT || 8000;
 
-app.use(cors({ origin: 'http://localhost:5173' }));
+app.use(cors({ 
+  origin: [
+    'http://localhost:5173',
+    'https://space-learning-system.vercel.app',
+    process.env.FRONTEND_URL || ''
+  ].filter(Boolean) 
+}));
 app.use(express.json());
 
 app.use('/api/nasa', nasaRoutes);
