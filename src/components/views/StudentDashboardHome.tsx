@@ -67,18 +67,13 @@ const ASSIGNMENTS = [
   { id: "surrogate", title: "Surrogate Physics Model", due: "3 хоногт", urgent: false },
 ];
 
-const ACHIEVEMENTS = [
-  { icon: "🏆", label: "First Notebook Run", locked: false },
-  { icon: "🚀", label: "NASA Data Explorer", locked: false },
-  { icon: "🔬", label: "Crater Expert", locked: true },
-  { icon: "🌙", label: "Lunar Scientist", locked: true },
-];
+
 
 const MOCK_ACTIVITY = [
-  { icon: "✅", text: "Part 2 дууссан", time: "2 цагийн өмнө" },
-  { icon: "📝", text: "Exercise 1 илгээсэн — 95% accuracy", time: "Өчигдөр" },
-  { icon: "🚀", text: "NASA NEO өгөгдөл судалсан", time: "2 өдрийн өмнө" },
-  { icon: "✅", text: "Part 1 дууссан", time: "3 өдрийн өмнө" },
+  { icon: "", text: "Part 2 дууссан", time: "2 цагийн өмнө" },
+  { icon: "", text: "Exercise 1 илгээсэн — 95% accuracy", time: "Өчигдөр" },
+  { icon: "", text: "NASA NEO өгөгдөл судалсан", time: "2 өдрийн өмнө" },
+  { icon: "", text: "Part 1 дууссан", time: "3 өдрийн өмнө" },
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -342,9 +337,9 @@ export function StudentDashboardHome() {
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.25em] text-sky-400">STUDENT VIEW</p>
               <h1 className="mt-2 text-3xl font-bold text-white">
-                Сайн уу, {user.name}! <span className="not-italic">👋</span>
+                Сайн уу, {user.name}! <span className="not-italic"></span>
               </h1>
-              <p className="mt-2 text-base text-sky-200/80">Study Case 1 — AI for Lunar Formation &amp; Structure</p>
+              <p className="mt-2 text-base text-sky-200/80">Study Case 1 AI for Lunar Formation &amp; Structure</p>
             </div>
 
             <div className="space-y-2">
@@ -443,7 +438,7 @@ export function StudentDashboardHome() {
           bg="bg-orange-400/10"
           value="3"
           label="Өдөр дараалан"
-          sub="🔥 Keep going!"
+          sub=" Keep going!"
         />
       </div>
 
@@ -652,18 +647,7 @@ export function StudentDashboardHome() {
           <div className="rounded-2xl border border-white/10 bg-white/5 p-5">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-400">Миний амжилтууд</p>
             <div className="mt-4 space-y-2">
-              {ACHIEVEMENTS.map((a) => (
-                <div
-                  key={a.label}
-                  className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 transition ${
-                    a.locked ? "border-white/5 bg-white/3 opacity-40" : "border-white/10 bg-white/5 hover:border-white/20"
-                  }`}
-                >
-                  <span className="text-lg">{a.locked ? "🔒" : a.icon}</span>
-                  <span className={`flex-1 text-xs ${a.locked ? "text-slate-600" : "text-slate-200"}`}>{a.label}</span>
-                  {!a.locked && <Award className="h-3.5 w-3.5 text-amber-300" />}
-                </div>
-              ))}
+             
             </div>
           </div>
         </div>
@@ -714,7 +698,7 @@ export function StudentDashboardHome() {
           {/* Card 1: NASA NEO */}
           <div className="flex flex-col rounded-2xl border border-white/10 bg-white/5 p-5 transition hover:border-sky-400/30 hover:bg-white/8">
             <div className="mb-3 flex items-start justify-between">
-              <span className="text-3xl">🌍</span>
+              <span className="text-3xl"></span>
               <LiveBadge />
             </div>
             <p className="text-sm font-semibold text-slate-100">Near Earth Objects</p>
@@ -737,7 +721,7 @@ export function StudentDashboardHome() {
           {/* Card 2: NASA APOD */}
           <div className="flex flex-col rounded-2xl border border-white/10 bg-white/5 p-5 transition hover:border-amber-400/30 hover:bg-white/8">
             <div className="mb-3 flex items-start justify-between">
-              <span className="text-3xl">🔭</span>
+              <span className="text-3xl"></span>
               <LiveBadge />
             </div>
             <p className="text-sm font-semibold text-slate-100">Astronomy Picture of Day</p>
@@ -759,7 +743,7 @@ export function StudentDashboardHome() {
           {/* Card 3: Lunar Dataset */}
           <div className="flex flex-col rounded-2xl border border-white/10 bg-white/5 p-5 transition hover:border-violet-400/30 hover:bg-white/8">
             <div className="mb-3">
-              <span className="text-3xl">🌙</span>
+              <span className="text-3xl"></span>
             </div>
             <p className="text-sm font-semibold text-slate-100">Lunar Surface Data</p>
             <p className="mt-1 text-xs text-slate-400">LROC polar mosaic, Moon Mineralogy Mapper</p>

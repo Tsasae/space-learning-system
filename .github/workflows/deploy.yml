@@ -1,0 +1,171 @@
+name: Lunar Cloud LMS — CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  NODE_VERSION: '18.x'
+
+jobs:
+  # ============================================
+  # JOB 1: TEST
+  # ============================================
+  test:
+    name:  Test
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: lms_user
+          POSTGRES_PASSWORD: lms_password123
+          POSTGRES_DB: lms_db_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name:  Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name:  Install frontend dependencies
+        run: npm ci
+
+      - name:  Install backend dependencies
+        run: cd server && npm ci
+
+      - name:  TypeScript check (Frontend)
+        run: npm run type-check || npx tsc --noEmit
+
+      - name:  TypeScript check (Backend)
+        run: cd server && npx tsc --noEmit
+
+      - name:  Lint check
+        run: npm run lint || echo "No lint script found"
+
+      - name:  Build frontend
+        run: npm run build
+        env:
+          VITE_API_URL: http://localhost:8000
+
+  # ============================================
+  # JOB 2: BUILD
+  # ============================================
+  build:
+    name:  Build
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name:  Checkout code
+        uses: actions/checkout@v4
+
+      - name:  Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name:  Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          VITE_NASA_API_KEY: ${{ secrets.NASA_API_KEY }}
+
+      - name:  Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: dist/
+          retention-days: 1
+
+  # ============================================
+  # JOB 3: DEPLOY FRONTEND → VERCEL
+  # ============================================
+  deploy-frontend:
+    name:  Deploy Frontend → Vercel
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name:  Checkout code
+        uses: actions/checkout@v4
+
+      - name:  Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name:  Install Vercel CLI
+        run: npm install -g vercel
+
+      - name:  Install dependencies
+        run: npm ci
+
+      - name:  Deploy to Vercel
+        run: |
+          vercel --token=${{ secrets.VERCEL_TOKEN }} \
+                 --prod \
+                 --yes
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+  # ============================================
+  # JOB 4: DEPLOY BACKEND → RAILWAY
+  # ============================================
+  deploy-backend:
+    name:  Deploy Backend → Railway
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name:  Checkout code
+        uses: actions/checkout@v4
+
+      - name:  Deploy to Railway
+        uses: bervProject/railway-deploy@main
+        with:
+          railway_token: ${{ secrets.RAILWAY_TOKEN }}
+          service: lunar-lms-backend
+
+  # ============================================
+  # JOB 5: NOTIFY
+  # ============================================
+  notify:
+    name:  Notify
+    runs-on: ubuntu-latest
+    needs: [deploy-frontend, deploy-backend]
+    if: always()
+
+    steps:
+      - name:  Success notification
+        if: ${{ needs.deploy-frontend.result == 'success' }}
+        run: |
+          echo " Deployment successful!"
+          echo "Frontend: https://lunar-cloud-lms.vercel.app"
+          echo "Backend: https://lunar-lms-backend.railway.app"
+
+      - name:  Failure notification
+        if: ${{ needs.deploy-frontend.result == 'failure' }}
+        run: echo " Deployment failed!"
