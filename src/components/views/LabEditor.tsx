@@ -162,6 +162,9 @@ export function LabEditor({ language }: { language: Language }) {
       setIframeSrc(`/jupyter/lab/index.html?path=free-experiment.ipynb`);
       setExerciseTitle("Free Experiment");
       setExerciseParam("free");
+    } else if (param === "free" || !param) {
+      setIframeSrc(`/jupyter/lab/index.html?path=free-experiment.ipynb`);
+      setExerciseTitle("Free Experiment");
     } else if (param && EXERCISES[param]) {
       setIframeSrc(`/jupyter/lab/index.html?path=exercise-${param}.ipynb`);
       setExerciseTitle(EXERCISES[param].title);
