@@ -152,7 +152,7 @@ const LOG_COLOR: Record<LogColor, string> = {
 
 export function LabEditor({ language }: { language: Language }) {
   const { t } = useTranslation(language);
-  const [iframeSrc, setIframeSrc] = useState('http://localhost:8888');
+  const [iframeSrc, setIframeSrc] = useState('/jupyter/lab/index.html');
   const [exerciseTitle, setExerciseTitle] = useState<string | null>(null);
   const [exerciseParam, setExerciseParam] = useState<string | null>(null);
 
