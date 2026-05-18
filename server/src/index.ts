@@ -43,6 +43,17 @@ app.get('/health', (_req, res) => {
 async function runMigrations() {
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
   try {
+    // Users table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        email VARCHAR(255) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        name VARCHAR(255),
+        role VARCHAR(50) DEFAULT 'student',
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
     // Courses table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS courses (
