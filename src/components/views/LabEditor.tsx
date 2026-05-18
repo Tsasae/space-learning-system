@@ -159,7 +159,7 @@ export function LabEditor({ language }: { language: Language }) {
   useEffect(() => {
     const param = new URLSearchParams(window.location.search).get("exercise");
     if (param && EXERCISES[param]) {
-      setIframeSrc(`http://localhost:8888/notebooks/exercise-${param}.ipynb`);
+      setIframeSrc(`/jupyter/lab/index.html?path=exercise-${param}.ipynb`);
       setExerciseTitle(EXERCISES[param].title);
       setExerciseParam(param);
     }
