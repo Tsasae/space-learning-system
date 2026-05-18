@@ -54,6 +54,22 @@ async function runMigrations() {
         created_at TIMESTAMPTZ DEFAULT NOW()
       )
     `);
+    // Course materials table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS course_materials (
+        id SERIAL PRIMARY KEY,
+        title TEXT,
+        file_url TEXT,
+        file_name TEXT,
+        file_type TEXT,
+        link_url TEXT,
+        link_type TEXT,
+        content_type TEXT,
+        instructor_id TEXT,
+        is_published BOOLEAN DEFAULT true,
+        created_at TIMESTAMPTZ DEFAULT NOW()
+      )
+    `);
     // Courses table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS courses (

@@ -36,7 +36,7 @@ router.post('/file', upload.single('file'), async (req: Request, res: Response) 
     if (!req.file) return res.status(400).json({ success: false, error: 'Файл байхгүй' });
 
     const { title, instructor_id } = req.body;
-    const fileUrl = `http://localhost:8000/uploads/${req.file.filename}`;
+    const fileUrl = `${process.env.BACKEND_URL || "https://space-learning-system.onrender.com"}/uploads/${req.file.filename}`;
     const fileType = path.extname(req.file.originalname).toLowerCase().replace('.', '');
     const contentType = fileType === 'ipynb' ? 'notebook' : 'slide';
 
