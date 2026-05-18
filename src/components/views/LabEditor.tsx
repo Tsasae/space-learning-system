@@ -152,7 +152,7 @@ const LOG_COLOR: Record<LogColor, string> = {
 
 export function LabEditor({ language }: { language: Language }) {
   const { t } = useTranslation(language);
-  const [iframeSrc, setIframeSrc] = useState('/jupyter/lab/index.html');
+  const [iframeSrc, setIframeSrc] = useState('https://mybinder.org/v2/gh/Tsasae/space-learning-system/main?labpath=free-experiment.ipynb');
   const [exerciseTitle, setExerciseTitle] = useState<string | null>(null);
   const [exerciseParam, setExerciseParam] = useState<string | null>(null);
 
