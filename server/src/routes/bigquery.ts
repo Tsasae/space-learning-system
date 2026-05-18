@@ -3,10 +3,25 @@ import { BigQuery } from '@google-cloud/bigquery';
 
 const router = Router();
 
-const bigquery = new BigQuery({
-  projectId: 'lunar-lms-bigquery',
-  keyFilename: '/home/tsatsral/Documents/lms-websystem /credentials/bigquery-key.json'
-});
+import fs from 'fs';
+import os from 'os';
+
+let bigquery: BigQuery;
+
+if (process.env.GOOGLE_CREDENTIALS_BASE64) {
+  const decoded = Buffer.from(process.env.GOOGLE_CREDENTIALS_BASE64, 'base64').toString('utf8');
+  const tmpFile = os.tmpdir() + '/bigquery-key.json';
+  fs.writeFileSync(tmpFile, decoded);
+  bigquery = new BigQuery({
+    projectId: 'lunar-lms-bigquery',
+    keyFilename: tmpFile
+  });
+} else {
+  bigquery = new BigQuery({
+    projectId: 'lunar-lms-bigquery',
+    keyFilename: '/home/tsatsral/Documents/lms-websystem /credentials/bigquery-key.json'
+  });
+}
 
 // Нийт статистик
 router.get('/stats', async (req: Request, res: Response) => {
