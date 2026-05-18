@@ -159,18 +159,18 @@ export function LabEditor({ language }: { language: Language }) {
   useEffect(() => {
     const param = new URLSearchParams(window.location.search).get("exercise");
     if (param === "free") {
-      setIframeSrc(`/jupyter/lab/index.html?path=free-experiment.ipynb`);
+      setIframeSrc(`https://mybinder.org/v2/gh/Tsasae/space-learning-system/main?labpath=free-experiment.ipynb`);
       setExerciseTitle("Free Experiment");
       setExerciseParam("free");
     } else if (param === "free" || !param) {
-      setIframeSrc(`/jupyter/lab/index.html?path=free-experiment.ipynb`);
+      setIframeSrc(`https://mybinder.org/v2/gh/Tsasae/space-learning-system/main?labpath=free-experiment.ipynb`);
       setExerciseTitle("Free Experiment");
     } else if (param && EXERCISES[param]) {
-      setIframeSrc(`/jupyter/lab/index.html?path=exercise-${param}.ipynb`);
+      setIframeSrc(`https://mybinder.org/v2/gh/Tsasae/space-learning-system/main?labpath=exercise-${param}.ipynb`);
       setExerciseTitle(EXERCISES[param].title);
       setExerciseParam(param);
     } else {
-      setIframeSrc(`/jupyter/lab/index.html?path=free-experiment.ipynb`);
+      setIframeSrc(`https://mybinder.org/v2/gh/Tsasae/space-learning-system/main?labpath=free-experiment.ipynb`);
     }
   }, []);
 
