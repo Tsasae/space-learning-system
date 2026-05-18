@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 import { create } from "zustand";
 
 export interface CaseProgress {
@@ -76,7 +77,7 @@ export const useCourseStore = create<CourseState>((set, get) => ({
     set({ coursesLoading: true });
     try {
       const res = await fetch(
-        `http://localhost:8000/api/courses/my-progress?student_id=${encodeURIComponent(studentId)}`
+        `${API_URL}/api/courses/my-progress?student_id=${encodeURIComponent(studentId)}`
       );
       const json = await res.json();
       if (json.success) {

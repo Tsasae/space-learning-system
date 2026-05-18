@@ -1,3 +1,4 @@
+import { API_URL } from '../../config';
 import { useEffect, useState } from "react";
 import { ChevronDown, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 import { SectionHeader } from "../common/SectionHeader";
@@ -363,7 +364,7 @@ export function CourseEnvironment() {
   const [coursesLoading, setCoursesLoading] = useState(true);
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/courses")
+    fetch(`${API_URL}/api/courses`)
       .then((r) => r.json())
       .then((j) => { if (j.success) setPublishedCourses(j.courses ?? j.data ?? []); })
       .catch(() => {})

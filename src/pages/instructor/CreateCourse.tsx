@@ -1,3 +1,4 @@
+import { API_URL } from '../../config';
 import { useRef, useState } from "react";
 import {
   ArrowLeft,
@@ -481,7 +482,7 @@ export default function CreateCourse() {
     if (!validate()) return;
     setPublishing(true);
     try {
-      await fetch("http://localhost:8000/api/courses", {
+      await fetch(`${API_URL}/api/courses`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

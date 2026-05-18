@@ -1,3 +1,4 @@
+import { API_URL } from '../../config';
 import { useEffect, useState } from "react";
 import {
   Award,
@@ -254,7 +255,7 @@ export function StudentDashboardHome() {
 
   useEffect(() => {
     // APOD — fetch 6 images for both the small gallery and the big NASA section
-    fetch("http://localhost:8000/api/nasa/apod?count=6")
+    fetch(`${API_URL}/api/nasa/apod?count=6`)
       .then((r) => r.json())
       .then((json) => {
         if (json.success && Array.isArray(json.data)) setApodItems(json.data);
@@ -263,7 +264,7 @@ export function StudentDashboardHome() {
       .finally(() => setApodLoading(false));
 
     // NEO asteroid count for dataset card
-    fetch("http://localhost:8000/api/nasa/neo")
+    fetch(`${API_URL}/api/nasa/neo`)
       .then((r) => r.json())
       .then((json) => {
         if (json.success && json.data?.near_earth_objects) {
@@ -276,7 +277,7 @@ export function StudentDashboardHome() {
 
     if (!user.id) return;
 
-    fetch(`http://localhost:8000/api/submissions/progress/${user.id}`)
+    fetch(`${API_URL}/api/submissions/progress/${user.id}`)
       .then((r) => r.json())
       .then((json) => {
         if (json.success) {
@@ -291,7 +292,7 @@ export function StudentDashboardHome() {
       })
       .catch(() => {});
 
-    fetch(`http://localhost:8000/api/submissions/student/${user.id}`)
+    fetch(`${API_URL}/api/submissions/student/${user.id}`)
       .then((r) => r.json())
       .then((json) => { if (json.success) setSubmissions(json.submissions ?? []); })
       .catch(() => {});

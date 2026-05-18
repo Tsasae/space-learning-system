@@ -1,3 +1,4 @@
+import { API_URL } from '../../config';
 import { useState } from "react";
 import { AlertCircle, Eye, EyeOff, Lock, Mail, Rocket, User } from "lucide-react";
 import { useTranslation } from "../../i18n/useTranslation";
@@ -56,7 +57,7 @@ export function LoginPage({ onLogin, language = "en" }: LoginPageProps) {
     setError(null);
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/api/auth/login", {
+      const res = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -86,7 +87,7 @@ export function LoginPage({ onLogin, language = "en" }: LoginPageProps) {
     setError(null);
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/api/auth/register", {
+      const res = await fetch(`${API_URL}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -1,3 +1,4 @@
+import { API_URL } from '../../config';
 import { useEffect, useState } from "react";
 import {
   Check,
@@ -161,7 +162,7 @@ function FeedbackModal({
     if (!text.trim()) return;
     setSending(true);
     try {
-      await fetch("http://localhost:8000/api/feedback", {
+      await fetch(`${API_URL}/api/feedback`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -324,7 +325,7 @@ export default function StudentsPage() {
 
     async function load() {
       try {
-        const res = await fetch("http://localhost:8000/api/instructor/students", {
+        const res = await fetch(`${API_URL}/api/instructor/students`, {
           signal: controller.signal,
         });
         if (!res.ok) throw new Error();
@@ -365,7 +366,7 @@ export default function StudentsPage() {
         }
       )
     );
-    fetch("http://localhost:8000/api/instructor/approve", {
+    fetch(`${API_URL}/api/instructor/approve`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ submission_id: subId, instructor_id: getInstructorId() }),

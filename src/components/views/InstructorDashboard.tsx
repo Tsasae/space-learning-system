@@ -1,3 +1,4 @@
+import { API_URL } from '../../config';
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   BookOpen,
@@ -222,7 +223,7 @@ function UploadFileTab({ onRefresh }: { onRefresh: () => void }) {
       formData.append("title", title.trim());
       formData.append("instructor_id", getInstructorId());
 
-      const res = await fetch("http://localhost:8000/api/upload/file", {
+      const res = await fetch(`${API_URL}/api/upload/file`, {
         method: "POST",
         body: formData,
       });
@@ -342,11 +343,11 @@ function UploadFileTab({ onRefresh }: { onRefresh: () => void }) {
 
 const NASA_API_PRESETS = {
   NEO: {
-    url: "http://localhost:8000/api/nasa/neo",
+    url: `${API_URL}/api/nasa/neo`,
     description: "Real-time asteroid tracking data from NASA NeoWs API",
   },
   APOD: {
-    url: "http://localhost:8000/api/nasa/apod",
+    url: `${API_URL}/api/nasa/apod`,
     description: "NASA Astronomy Picture of the Day collection",
   },
 } as const;
@@ -400,7 +401,7 @@ function AddLinkTab({ onRefresh }: { onRefresh: () => void }) {
     setError("");
     setLoading(true);
     try {
-      await fetch("http://localhost:8000/api/upload/link", {
+      await fetch(`${API_URL}/api/upload/link`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -698,7 +699,7 @@ function FeedbackPanel({ student, onClose }: { student: Student; onClose: () => 
     if (!text.trim() || isNaN(g) || g < 0 || g > 100) return;
     setSending(true);
     try {
-      await fetch("http://localhost:8000/api/feedback", {
+      await fetch(`${API_URL}/api/feedback`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -822,7 +823,7 @@ export function InstructorDashboard() {
 
   const fetchContent = useCallback(async () => {
     try {
-      const res = await fetch("http://localhost:8000/api/upload/courses");
+      const res = await fetch(`${API_URL}/api/upload/courses`);
       if (!res.ok) throw new Error();
       const json = await res.json();
       const items: ApiContentItem[] = json.courses ?? [];
@@ -838,7 +839,7 @@ export function InstructorDashboard() {
 
   const handleDelete = async (id: string) => {
     try {
-      await fetch(`http://localhost:8000/api/upload/courses/${id}`, { method: "DELETE" });
+      await fetch(`${API_URL}/api/upload/courses/${id}`, { method: "DELETE" });
     } finally {
       fetchContent();
     }

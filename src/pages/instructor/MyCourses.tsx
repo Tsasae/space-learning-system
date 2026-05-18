@@ -1,3 +1,4 @@
+import { API_URL } from '../../config';
 import { useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
@@ -261,7 +262,7 @@ function CourseCard({
   ];
 
   const handleDuplicate = () => {
-    fetch("http://localhost:8000/api/instructor/courses", {
+    fetch(`${API_URL}/api/instructor/courses`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...course, title: `${course.title} (хуулбар)`, status: "draft" }),
@@ -365,7 +366,7 @@ function CourseListView({
 
   useEffect(() => {
     const ctrl = new AbortController();
-    fetch("http://localhost:8000/api/instructor/courses", { signal: ctrl.signal })
+    fetch(`${API_URL}/api/instructor/courses`, { signal: ctrl.signal })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((d) => setCourses(d.courses ?? MOCK_COURSES))
       .catch(() => setCourses(MOCK_COURSES))
@@ -380,7 +381,7 @@ function CourseListView({
 
   const handleStatusChange = (id: number, status: CourseStatus) => {
     setCourses((prev) => prev.map((c) => (c.id === id ? { ...c, status } : c)));
-    fetch(`http://localhost:8000/api/instructor/courses/${id}`, {
+    fetch(`${API_URL}/api/instructor/courses/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
@@ -389,7 +390,7 @@ function CourseListView({
 
   const handleDelete = (id: number) => {
     setCourses((prev) => prev.filter((c) => c.id !== id));
-    fetch(`http://localhost:8000/api/instructor/courses/${id}`, { method: "DELETE" }).catch(() => {});
+    fetch(`${API_URL}/api/instructor/courses/${id}`, { method: "DELETE" }).catch(() => {});
   };
 
   return (
@@ -486,7 +487,7 @@ function CourseDetailView({
     if (!feedbackFor) return;
     setFbSending(true);
     try {
-      await fetch("http://localhost:8000/api/feedback", {
+      await fetch(`${API_URL}/api/feedback`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ student_id: feedbackFor.id, grade: Number(fbGrade), comment: fbText }),
@@ -764,7 +765,7 @@ function EditCourseView({ course, onBack, onSaved }: {
       assignment: { name: assName, description: assDesc, dueDate, minAccuracy: minAcc },
     };
     try {
-      await fetch(`http://localhost:8000/api/instructor/courses/${course.id}`, {
+      await fetch(`${API_URL}/api/instructor/courses/${course.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updated),

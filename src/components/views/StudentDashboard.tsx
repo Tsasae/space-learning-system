@@ -1,3 +1,4 @@
+import { API_URL } from '../../config';
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   BookOpen,
@@ -296,7 +297,7 @@ function SlidesViewer({
   const isPDF = lower.includes(".pdf");
   const isPPT = lower.includes(".ppt") || lower.includes(".pps");
 
-  const fullUrl = fileUrl.startsWith("http") ? fileUrl : `http://localhost:8000${fileUrl}`;
+  const fullUrl = fileUrl.startsWith("http") ? fileUrl : `${API_URL}${fileUrl}`;
 
   const iframeSrc = isPDF
     ? fullUrl
@@ -459,7 +460,7 @@ export function StudentDashboard() {
 
   // ── Fetch course content ────────────────────────────────────────────────────
   useEffect(() => {
-    fetch("http://localhost:8000/api/upload/courses")
+    fetch(`${API_URL}/api/upload/courses`)
       .then((r) => r.json())
       .then((j) => { if (j.success) setApiContent(j.courses ?? []); })
       .catch(() => {})
@@ -469,7 +470,7 @@ export function StudentDashboard() {
   // ── Fetch part progress ─────────────────────────────────────────────────────
   useEffect(() => {
     if (!studentId) { setProgressLoading(false); return; }
-    fetch(`http://localhost:8000/api/submissions/progress/${studentId}`)
+    fetch(`${API_URL}/api/submissions/progress/${studentId}`)
       .then((r) => r.json())
       .then((j) => {
         if (j.success) {
@@ -486,7 +487,7 @@ export function StudentDashboard() {
   // ── Fetch past submissions (to pre-set exerciseSubmitted) ───────────────────
   useEffect(() => {
     if (!studentId) return;
-    fetch(`http://localhost:8000/api/submissions/student/${studentId}`)
+    fetch(`${API_URL}/api/submissions/student/${studentId}`)
       .then((r) => r.json())
       .then((j) => {
         if (j.success && (j.submissions ?? []).length > 0) {
@@ -506,7 +507,7 @@ export function StudentDashboard() {
     setQuizAnswers({});
     setQuizSubmitted(false);
     setQuizScore(null);
-    fetch(`http://localhost:8000/api/courses/${activeCase}`)
+    fetch(`${API_URL}/api/courses/${activeCase}`)
       .then((r) => r.json())
       .then((j) => { if (j.success) setCurrentCourseData(j.data ?? j.course ?? null); })
       .catch(() => {})
@@ -517,7 +518,7 @@ export function StudentDashboard() {
   useEffect(() => {
     updateProgress(activeCase || 1, { materialViewed: true });
     if (activeCase > 0 && studentId) {
-      fetch(`http://localhost:8000/api/courses/${activeCase}/progress`, {
+      fetch(`${API_URL}/api/courses/${activeCase}/progress`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ student_id: studentId, material_viewed: true }),
@@ -529,7 +530,7 @@ export function StudentDashboard() {
     if (!exerciseSubmitted) return;
     updateProgress(activeCase || 1, { exerciseSubmitted: true });
     if (activeCase > 0 && studentId) {
-      fetch(`http://localhost:8000/api/courses/${activeCase}/progress`, {
+      fetch(`${API_URL}/api/courses/${activeCase}/progress`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ student_id: studentId, exercise_submitted: true }),
@@ -541,7 +542,7 @@ export function StudentDashboard() {
     if (!quizPassed) return;
     updateProgress(activeCase || 1, { quizPassed: true });
     if (activeCase > 0 && studentId && quizScore !== null) {
-      fetch(`http://localhost:8000/api/courses/${activeCase}/progress`, {
+      fetch(`${API_URL}/api/courses/${activeCase}/progress`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ student_id: studentId, quiz_score: (quizScore / activeQuizQs.length) * 100 }),
@@ -565,7 +566,7 @@ export function StudentDashboard() {
     if (completedParts.has(num)) return;
     setTogglingPart(num);
     try {
-      await fetch("http://localhost:8000/api/submissions/progress", {
+      await fetch(`${API_URL}/api/submissions/progress`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ student_id: studentId, part_number: num, part_title: title }),
@@ -585,7 +586,7 @@ export function StudentDashboard() {
       if (subNotes) formData.append("result_output", subNotes);
       if (notebookFile) formData.append("file", notebookFile);
 
-      await fetch("http://localhost:8000/api/submissions", {
+      await fetch(`${API_URL}/api/submissions`, {
         method: "POST",
         body: formData,
       });
@@ -604,7 +605,7 @@ export function StudentDashboard() {
     setQuizSubmitted(true);
 
     if (studentId) {
-      fetch("http://localhost:8000/api/quiz/submit", {
+      fetch(`${API_URL}/api/quiz/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -626,7 +627,7 @@ export function StudentDashboard() {
     link.click();
     updateProgress(activeCase || 1, { certificateIssued: true });
     if (activeCase > 0 && studentId) {
-      fetch(`http://localhost:8000/api/courses/${activeCase}/progress`, {
+      fetch(`${API_URL}/api/courses/${activeCase}/progress`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ student_id: studentId, certificate_issued: true }),
@@ -1024,7 +1025,7 @@ export function StudentDashboard() {
                               href={
                                 file.url.startsWith("http")
                                   ? file.url
-                                  : `http://localhost:8000${file.url}`
+                                  : `${API_URL}${file.url}`
                               }
                               download
                               className="rounded border border-sky-500/30 bg-sky-500/20 px-2 py-1 text-xs text-sky-400 transition hover:bg-sky-500/30"
@@ -1056,7 +1057,7 @@ export function StudentDashboard() {
                     src={
                       previewFile.url.startsWith("http")
                         ? previewFile.url
-                        : `http://localhost:8000${previewFile.url}`
+                        : `${API_URL}${previewFile.url}`
                     }
                     className="w-full bg-white"
                     style={{ height: 400, border: "none" }}

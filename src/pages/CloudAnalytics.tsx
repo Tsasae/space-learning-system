@@ -1,3 +1,4 @@
+import { API_URL } from '../config';
 import { useEffect, useState } from "react";
 import {
   Bar,
@@ -73,19 +74,19 @@ export default function CloudAnalytics() {
       setError(null);
 
       const [statsResult, mlResult, wildfireResult, landsatBySatResult] = await Promise.allSettled([
-        fetch("http://localhost:8000/api/bigquery/stats", { signal }).then((r) => {
+        fetch(`${API_URL}/api/bigquery/stats`, { signal }).then((r) => {
           if (!r.ok) throw new Error("stats failed");
           return r.json();
         }),
-        fetch("http://localhost:8000/api/bigquery/ml-results", { signal }).then((r) => {
+        fetch(`${API_URL}/api/bigquery/ml-results`, { signal }).then((r) => {
           if (!r.ok) throw new Error("ml-results failed");
           return r.json();
         }),
-        fetch("http://localhost:8000/api/bigquery/wildfire?limit=500&confidence=high", { signal }).then((r) => {
+        fetch(`${API_URL}/api/bigquery/wildfire?limit=500&confidence=high`, { signal }).then((r) => {
           if (!r.ok) throw new Error("wildfire failed");
           return r.json();
         }),
-        fetch("http://localhost:8000/api/bigquery/landsat-by-satellite", { signal }).then((r) => {
+        fetch(`${API_URL}/api/bigquery/landsat-by-satellite`, { signal }).then((r) => {
           if (!r.ok) throw new Error("landsat-by-satellite failed");
           return r.json();
         }),
