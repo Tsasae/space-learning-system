@@ -6,9 +6,6 @@ export const translations = {
     virtualLab: "Virtual Lab",
     spatialData: "Spatial Data",
     cloudAnalytics: "Cloud Analytics",
-    analytics: "Analytics & Reports",
-    hpcJobs: "HPC Jobs",
-    projects: "Projects",
     settings: "Settings",
 
     // Dashboard
@@ -92,9 +89,6 @@ export const translations = {
     virtualLab: "Виртуал лаборатори",
     spatialData: "Орон зайн өгөгдөл",
     cloudAnalytics: "Үүлэн Аналитик",
-    analytics: "Аналитик & Тайлан",
-    hpcJobs: "HPC Ажлууд",
-    projects: "Төслүүд",
     settings: "Тохиргоо",
 
     // Dashboard

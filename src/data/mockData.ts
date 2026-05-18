@@ -1,25 +1,20 @@
 import {
-  BarChart3,
   BookOpen,
   BookPlus,
   ClipboardList,
   Cloud,
   Database,
   FlaskConical,
-  FolderKanban,
   LayoutDashboard,
   LibraryBig,
   Settings,
   Users,
-  Workflow,
 } from "lucide-react";
 import {
   DatasetItem,
-  HPCJob,
   MetricCardData,
   ModuleUnit,
   NavItem,
-  ProjectCard,
   TimelinePoint,
 } from "../types";
 
@@ -35,11 +30,6 @@ export const navigationItems: NavItem[] = [
   { key: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { key: "courses", label: "Course Environment", icon: BookOpen },
   { key: "lab", label: "Virtual Lab", icon: FlaskConical },
-  { key: "spatial", label: "Spatial Data", icon: Database },
-  { key: "cloudAnalytics", label: "Cloud Analytics", icon: Cloud },
-  { key: "analytics", label: "Analytics & Reports", icon: BarChart3 },
-  { key: "jobs", label: "HPC Jobs", icon: Workflow },
-  { key: "projects", label: "Projects", icon: FolderKanban },
   { key: "settings", label: "Settings", icon: Settings },
 ];
 
@@ -179,60 +169,4 @@ export const satisfactionHeatmap = [
   ["Spatial Tools", 4.1],
   ["HPC Queue", 3.9],
   ["Support", 4.5],
-];
-
-export const hpcJobs: HPCJob[] = [
-  {
-    id: "job-2194",
-    model: "CNN crater detection",
-    resources: "2x A100, 48 CPU",
-    status: "Running",
-    progress: 64,
-    logs: [
-      "[14:10] Allocated node luna-gpu-07",
-      "[14:13] Epoch 12/30 accuracy 0.93",
-      "[14:18] Validation sweep in progress",
-    ],
-  },
-  {
-    id: "job-2191",
-    model: "MPI terrain clustering",
-    resources: "128 CPU",
-    status: "Completed",
-    progress: 100,
-    logs: [
-      "[13:02] Queue admitted",
-      "[13:22] Parallel tiles merged",
-      "[13:28] Results archived to S3",
-    ],
-  },
-  {
-    id: "job-2201",
-    model: "Transformer mineral classifier",
-    resources: "1x H100, 32 CPU",
-    status: "Queued",
-    progress: 12,
-    logs: ["[14:19] Pending GPU reservation", "[14:19] Est. start 8 min"],
-  },
-];
-
-export const projects: ProjectCard[] = [
-  {
-    title: "Crater Catalog Intelligence",
-    team: "Team Tycho",
-    focus: "Automated crater indexing with validation on polar mosaics",
-    milestone: "Annotation QA review",
-  },
-  {
-    title: "Moonquake Signal Discovery",
-    team: "Team Apollo",
-    focus: "Event clustering from seismic series and anomaly screening",
-    milestone: "Feature engineering complete",
-  },
-  {
-    title: "AI Landing Site Selection",
-    team: "Team Shackleton",
-    focus: "Safety, illumination, and resource-aware ranking engine",
-    milestone: "Decision dashboard prototype",
-  },
 ];

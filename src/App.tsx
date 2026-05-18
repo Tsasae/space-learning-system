@@ -3,12 +3,9 @@ import { BrowserRouter } from "react-router-dom";
 import { LoginPage } from "./components/auth/LoginPage";
 import { DashboardLayout } from "./components/layout/DashboardLayout";
 import { RoleDashboard } from "./components/dashboards/RoleDashboard";
-import { AnalyticsPanel } from "./components/views/AnalyticsPanel";
 import { CourseEnvironment } from "./components/views/CourseEnvironment";
-import { HPCJobsPanel } from "./components/views/HPCJobsPanel";
 import { LabEditor } from "./components/views/LabEditor";
 import { MapViewer } from "./components/views/MapViewer";
-import { ProjectsPanel } from "./components/views/ProjectsPanel";
 import { SettingsPanel } from "./components/views/SettingsPanel";
 import { InstructorDashboard } from "./components/views/InstructorDashboard";
 import CloudAnalytics from "./pages/CloudAnalytics";
@@ -101,12 +98,6 @@ function App() {
         return <StudentsPage />;
       case "instructorAssignments":
         return <InstructorDashboard />;
-      case "analytics":
-        return <AnalyticsPanel />;
-      case "jobs":
-        return <HPCJobsPanel />;
-      case "projects":
-        return <ProjectsPanel />;
       case "settings":
         return <SettingsPanel />;
       case "instructor":

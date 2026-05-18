@@ -8,9 +8,6 @@ export type ViewKey =
   | "lab"
   | "spatial"
   | "cloudAnalytics"
-  | "analytics"
-  | "jobs"
-  | "projects"
   | "settings"
   | "instructor"
   | "createCourse"
@@ -55,15 +52,6 @@ export interface DatasetItem {
   type: string;
 }
 
-export interface HPCJob {
-  id: string;
-  model: string;
-  resources: string;
-  status: "Running" | "Completed" | "Queued";
-  progress: number;
-  logs: string[];
-}
-
 export interface AuthUser {
   id: string;
   email: string;
@@ -71,9 +59,3 @@ export interface AuthUser {
   role: UserRole;
 }
 
-export interface ProjectCard {
-  title: string;
-  team: string;
-  focus: string;
-  milestone: string;
-}
