@@ -855,7 +855,7 @@ export function StudentDashboard() {
                                   </div>
                                 </div>
                                 <iframe
-                                  src={`https://asset-pmid-laden-disciplinary.trycloudflare.com/hub/user-redirect/lab/tree/${part.exercise.id}.ipynb`}
+                                  src={`https://sitting-conference-homeland-freeze.trycloudflare.com/hub/user-redirect/lab/tree/${part.exercise.id}.ipynb`}
                                   className="w-full bg-white"
                                   style={{ height: "650px", border: "none" }}
                                   title={part.exercise.title}
@@ -1083,7 +1083,7 @@ export function StudentDashboard() {
               </div>
               <div className="flex items-center gap-2">
                 <a
-                  href="https://asset-pmid-laden-disciplinary.trycloudflare.com/hub/user-redirect/lab/tree/free-experiment.ipynb"
+                  href="https://sitting-conference-homeland-freeze.trycloudflare.com/hub/user-redirect/lab/tree/free-experiment.ipynb"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="rounded-lg border border-sky-500/30 bg-sky-500/20 px-3 py-1 text-xs text-sky-400 transition hover:bg-sky-500/30"
@@ -1129,7 +1129,7 @@ export function StudentDashboard() {
 
             {/* Jupyter iframe */}
             <iframe
-              src="https://asset-pmid-laden-disciplinary.trycloudflare.com/hub/user-redirect/lab/tree/free-experiment.ipynb"
+              src="https://sitting-conference-homeland-freeze.trycloudflare.com/hub/user-redirect/lab/tree/free-experiment.ipynb"
               className="w-full bg-white"
               style={{ height: 700, border: "none" }}
               title="Free Experiment Notebook"
