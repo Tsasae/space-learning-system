@@ -152,25 +152,25 @@ const LOG_COLOR: Record<LogColor, string> = {
 
 export function LabEditor({ language }: { language: Language }) {
   const { t } = useTranslation(language);
-  const [iframeSrc, setIframeSrc] = useState('https://mybinder.org/v2/gh/Tsasae/space-learning-system/main?labpath=free-experiment.ipynb');
+  const [iframeSrc, setIframeSrc] = useState('http://178.128.102.178/hub/user-redirect/lab/tree/free-experiment.ipynb');
   const [exerciseTitle, setExerciseTitle] = useState<string | null>(null);
   const [exerciseParam, setExerciseParam] = useState<string | null>(null);
 
   useEffect(() => {
     const param = new URLSearchParams(window.location.search).get("exercise");
     if (param === "free") {
-      setIframeSrc(`https://mybinder.org/v2/gh/Tsasae/space-learning-system/main?labpath=free-experiment.ipynb`);
+      setIframeSrc(`http://178.128.102.178/hub/user-redirect/lab/tree/free-experiment.ipynb`);
       setExerciseTitle("Free Experiment");
       setExerciseParam("free");
     } else if (param === "free" || !param) {
-      setIframeSrc(`https://mybinder.org/v2/gh/Tsasae/space-learning-system/main?labpath=free-experiment.ipynb`);
+      setIframeSrc(`http://178.128.102.178/hub/user-redirect/lab/tree/free-experiment.ipynb`);
       setExerciseTitle("Free Experiment");
     } else if (param && EXERCISES[param]) {
-      setIframeSrc(`https://mybinder.org/v2/gh/Tsasae/space-learning-system/main?labpath=exercise-${param}.ipynb`);
+      setIframeSrc(`http://178.128.102.178/hub/user-redirect/lab/tree/exercise-${param}.ipynb`);
       setExerciseTitle(EXERCISES[param].title);
       setExerciseParam(param);
     } else {
-      setIframeSrc(`https://mybinder.org/v2/gh/Tsasae/space-learning-system/main?labpath=free-experiment.ipynb`);
+      setIframeSrc(`http://178.128.102.178/hub/user-redirect/lab/tree/free-experiment.ipynb`);
     }
   }, []);
 
