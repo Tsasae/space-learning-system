@@ -854,13 +854,14 @@ export function StudentDashboard() {
                                     </button>
                                   </div>
                                 </div>
-                                <iframe
-                                  src={`https://online-facilitate-split-sticky.trycloudflare.com/hub/user-redirect/lab/tree/${part.exercise.id}.ipynb`}
-                                  className="w-full bg-white"
-                                  style={{ height: "650px", border: "none" }}
-                                  title={part.exercise.title}
-                                />
+                                <iframe src={`https://online-facilitate-split-sticky.trycloudflare.com/user/student/lab/tree/${part.exercise.id}.ipynb?token=42e9fcc4a2f01e486a922be9a2d4a78e4f1ed5cbb02e487f9ab2cd95b08c04be`} className="w-full bg-white" style={{ height: "650px", border: "none" }} title="Jupyter Notebook" />
                               </div>
+
+
+
+
+
+
                             )}
 
                             {!done && (
