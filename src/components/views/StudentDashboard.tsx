@@ -854,7 +854,7 @@ export function StudentDashboard() {
                                     </button>
                                   </div>
                                 </div>
-                                <iframe src={`https://online-facilitate-split-sticky.trycloudflare.com/user/student/lab/tree/${part.exercise.id}.ipynb?token=42e9fcc4a2f01e486a922be9a2d4a78e4f1ed5cbb02e487f9ab2cd95b08c04be`} className="w-full bg-white" style={{ height: "650px", border: "none" }} title="Jupyter Notebook" />
+                                <iframe src={`https://coordinated-relying-labs-those.trycloudflare.com/user/student/lab/tree/${part.exercise.id}.ipynb?token=42e9fcc4a2f01e486a922be9a2d4a78e4f1ed5cbb02e487f9ab2cd95b08c04be`} className="w-full bg-white" style={{ height: "650px", border: "none" }} title="Jupyter Notebook" />
                               </div>
 
 
@@ -1084,7 +1084,7 @@ export function StudentDashboard() {
               </div>
               <div className="flex items-center gap-2">
                 <a
-                  href="https://online-facilitate-split-sticky.trycloudflare.com/hub/user-redirect/lab/tree/free-experiment.ipynb"
+                  href="https://coordinated-relying-labs-those.trycloudflare.com/hub/user-redirect/lab/tree/free-experiment.ipynb"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="rounded-lg border border-sky-500/30 bg-sky-500/20 px-3 py-1 text-xs text-sky-400 transition hover:bg-sky-500/30"
@@ -1130,7 +1130,7 @@ export function StudentDashboard() {
 
             {/* Jupyter iframe */}
             <iframe
-              src="https://online-facilitate-split-sticky.trycloudflare.com/hub/user-redirect/lab/tree/free-experiment.ipynb"
+              src="https://coordinated-relying-labs-those.trycloudflare.com/hub/user-redirect/lab/tree/free-experiment.ipynb"
               className="w-full bg-white"
               style={{ height: 700, border: "none" }}
               title="Free Experiment Notebook"
