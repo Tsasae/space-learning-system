@@ -152,25 +152,25 @@ const LOG_COLOR: Record<LogColor, string> = {
 
 export function LabEditor({ language }: { language: Language }) {
   const { t } = useTranslation(language);
-  const [iframeSrc, setIframeSrc] = useState('http://jupyter.cloudlms.xyz/hub/user-redirect/lab/tree/free-experiment.ipynb');
+  const [iframeSrc, setIframeSrc] = useState('https://jupyter.cloudlms.xyz/hub/user-redirect/lab/tree/free-experiment.ipynb');
   const [exerciseTitle, setExerciseTitle] = useState<string | null>(null);
   const [exerciseParam, setExerciseParam] = useState<string | null>(null);
 
   useEffect(() => {
     const param = new URLSearchParams(window.location.search).get("exercise");
     if (param === "free") {
-      setIframeSrc(`http://jupyter.cloudlms.xyz/hub/user-redirect/lab/tree/free-experiment.ipynb`);
+      setIframeSrc(`https://jupyter.cloudlms.xyz/hub/user-redirect/lab/tree/free-experiment.ipynb`);
       setExerciseTitle("Free Experiment");
       setExerciseParam("free");
     } else if (param === "free" || !param) {
-      setIframeSrc(`http://jupyter.cloudlms.xyz/hub/user-redirect/lab/tree/free-experiment.ipynb`);
+      setIframeSrc(`https://jupyter.cloudlms.xyz/hub/user-redirect/lab/tree/free-experiment.ipynb`);
       setExerciseTitle("Free Experiment");
     } else if (param && EXERCISES[param]) {
-      setIframeSrc(`http://jupyter.cloudlms.xyz/hub/user-redirect/lab/tree/exercise-${param}.ipynb`);
+      setIframeSrc(`https://jupyter.cloudlms.xyz/hub/user-redirect/lab/tree/exercise-${param}.ipynb`);
       setExerciseTitle(EXERCISES[param].title);
       setExerciseParam(param);
     } else {
-      setIframeSrc(`http://jupyter.cloudlms.xyz/hub/user-redirect/lab/tree/free-experiment.ipynb`);
+      setIframeSrc(`https://jupyter.cloudlms.xyz/hub/user-redirect/lab/tree/free-experiment.ipynb`);
     }
   }, []);
 
