@@ -231,11 +231,13 @@ export function LabEditor({ language }: { language: Language }) {
           </div>
 
           <div className="overflow-hidden rounded-[24px] border border-white/10">
-            <iframe
-              src={iframeSrc}
-              style={{ width: '100%', height: '100%', border: 'none', minHeight: '600px' }}
-              title="Jupyter Notebook"
-            />
+            <div className="flex flex-col items-center justify-center gap-4 py-16">
+              <a href={iframeSrc} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 rounded-2xl bg-sky-400/20 px-6 py-3 text-sky-200 hover:bg-sky-400/30 transition">
+                🚀 JupyterHub-д нээх
+              </a>
+              <p className="text-xs text-slate-500">Шинэ tab-д нээгдэнэ — нэвтэрч notebook ажиллуулна уу</p>
+            </div>
+
           </div>
         </div>
 
