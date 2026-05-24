@@ -154,11 +154,13 @@ router.get('/landsat-raw', async (req, res) => {
     const query = `
       SELECT 
         cloud_cover,
-        solar_elevation_angle,
+        north_lat,
+        south_lat,
+        east_lon,
+        west_lon,
         scene_quality_category
       FROM \`bigquery-public-data.cloud_storage_geo_index.landsat_index\`
       WHERE cloud_cover IS NOT NULL
-        AND solar_elevation_angle IS NOT NULL
       LIMIT 5000
     `;
     const [rows] = await bigquery.query(query);
