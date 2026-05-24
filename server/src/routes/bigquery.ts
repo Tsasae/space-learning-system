@@ -157,8 +157,7 @@ router.get('/landsat-raw', async (req, res) => {
         north_lat,
         south_lat,
         east_lon,
-        west_lon,
-        scene_quality_category
+        west_lon
       FROM \`bigquery-public-data.cloud_storage_geo_index.landsat_index\`
       WHERE cloud_cover IS NOT NULL
       LIMIT 5000
