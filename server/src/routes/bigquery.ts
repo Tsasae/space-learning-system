@@ -148,3 +148,22 @@ router.get('/landsat-by-satellite', async (req: Request, res: Response) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+// Landsat жинхэн өгөгдөл — ML-д зориулсан
+router.get('/landsat-raw', async (req, res) => {
+  try {
+    const query = `
+      SELECT 
+        cloud_cover,
+        solar_elevation_angle,
+        scene_quality_category
+      FROM \`bigquery-public-data.cloud_storage_geo_index.landsat_index\`
+      WHERE cloud_cover IS NOT NULL
+        AND solar_elevation_angle IS NOT NULL
+      LIMIT 5000
+    `;
+    const [rows] = await bigquery.query(query);
+    res.json({ success: true, data: rows });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
