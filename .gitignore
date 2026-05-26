@@ -13,3 +13,4 @@ jupyterlite/
 *.tsbuildinfo
 server/node_modules/
 server/coverage/
+server/node_modules/
