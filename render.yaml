@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: lunar-lms-api
+    name: space-learning-system
     env: node
-    buildCommand: cd server && npm ci && pip3 install -r ../backend/requirements.txt
+    buildCommand: pip3 install papermill scikit-learn pandas numpy requests tensorflow && cd server && npm ci
     startCommand: cd server && npm start
