@@ -71,10 +71,12 @@ interface KMResult {
 }
 interface PCAResult {
   algorithm: 'pca'; n_components: number;
-  explained_variance: number[];
-  cumulative_variance: number[];
-  components_plot: { pc1: number; pc2: number; label: string }[];
-  loadings: { feature: string; pc1: number; pc2?: number }[];
+  // backend puts these inside metrics{}; keep top-level as optional fallback
+  metrics?: { explained_variance?: number[]; cumulative_variance?: number | number[] };
+  explained_variance?: number[];
+  cumulative_variance?: number | number[];
+  components_plot?: { pc1: number; pc2: number; label: string }[];
+  loadings?: { feature: string; pc1: number; pc2?: number }[];
 }
 interface CNNResult {
   algorithm: 'cnn'; num_classes: number;
@@ -505,22 +507,41 @@ function ResultsView({ result }: { result: MLResult }) {
 
     case 'pca': {
       const r = result as PCAResult;
+      const explained: number[] =
+        r.metrics?.explained_variance ?? r.explained_variance ?? [];
+      const cumulative: number[] = explained.map((_, i) =>
+        +explained.slice(0, i + 1).reduce((a, b) => a + b, 0).toFixed(4)
+      );
+      const components = r.components_plot ?? [];
+      const loadings   = r.loadings ?? [];
       return (
         <div className="space-y-5">
           {engineBadge && <div>{engineBadge}</div>}
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {r.explained_variance.map((v, i) => (
-              <MetricCard key={i} label={`PC${i + 1} variance`} value={v} />
-            ))}
-          </div>
-          <div>
-            <p className="mb-2 text-[10px] uppercase tracking-widest text-slate-500">Explained Variance per Component</p>
-            <VarianceChart explained={r.explained_variance} cumulative={r.cumulative_variance} />
-          </div>
-          <div>
-            <p className="mb-2 text-[10px] uppercase tracking-widest text-slate-500">2D Component Space</p>
-            <PCAScatterChart data={r.components_plot} />
-          </div>
+          {explained.length > 0 && (
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {explained.map((v, i) => (
+                <MetricCard key={i} label={`PC${i + 1} variance`} value={v} />
+              ))}
+            </div>
+          )}
+          {explained.length > 0 && (
+            <div>
+              <p className="mb-2 text-[10px] uppercase tracking-widest text-slate-500">Explained Variance per Component</p>
+              <VarianceChart explained={explained} cumulative={cumulative} />
+            </div>
+          )}
+          {components.length > 0 && (
+            <div>
+              <p className="mb-2 text-[10px] uppercase tracking-widest text-slate-500">2D Component Space</p>
+              <PCAScatterChart data={components} />
+            </div>
+          )}
+          {loadings.length > 0 && (
+            <div>
+              <p className="mb-2 text-[10px] uppercase tracking-widest text-slate-500">Feature Loadings (PC1)</p>
+              <CoefficientsChart data={loadings.map(l => ({ feature: l.feature, coefficient: l.pc1 }))} />
+            </div>
+          )}
         </div>
       );
     }
