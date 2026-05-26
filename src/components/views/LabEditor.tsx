@@ -17,6 +17,34 @@ import { API_URL } from '../../config';
 
 const PALETTE = ['#38bdf8', '#34d399', '#f59e0b', '#f87171', '#a78bfa', '#22d3ee', '#fb923c'];
 
+const DEMO_DATASETS: Record<AlgoId, { url: string; target: string; description: string }> = {
+  random_forest: {
+    url: 'https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv',
+    target: 'Survived',
+    description: 'Titanic — 891 зорчигчийн амьд үлдсэн эсэхийг таамаглана',
+  },
+  linear_regression: {
+    url: 'https://raw.githubusercontent.com/selva86/datasets/master/BostonHousing.csv',
+    target: 'medv',
+    description: 'Boston Housing — орон сууцны үнэ таамаглана',
+  },
+  kmeans: {
+    url: 'https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv',
+    target: '',
+    description: 'Iris цэцэг — 3 төрлөөр бүлэглэнэ',
+  },
+  pca: {
+    url: 'https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv',
+    target: '',
+    description: 'Iris цэцэг — 2D болгон харуулна',
+  },
+  cnn: {
+    url: '',
+    target: '',
+    description: 'Зургийн файл upload хийнэ үү',
+  },
+};
+
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
 type AlgoId = 'random_forest' | 'linear_regression' | 'kmeans' | 'pca' | 'cnn';
@@ -550,6 +578,8 @@ function ConfigPanel({
   onStop: () => void;
 }) {
   const meta = ALGO_META[algo];
+  const demo = DEMO_DATASETS[algo];
+  const isDemo = demo.url !== '' && datasetUrl === demo.url;
   const fileRef = useRef<HTMLInputElement>(null);
   const inputCls = 'w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-slate-200 placeholder-slate-500 focus:border-sky-400/50 focus:outline-none';
 
@@ -574,8 +604,13 @@ function ConfigPanel({
               placeholder={algo === 'cnn' ? 'ZIP URL (optional)' : 'CSV / Excel / JSON URL (optional)'}
               value={datasetUrl}
               onChange={e => setDatasetUrl(e.target.value)}
-              className={`${inputCls} pl-8`}
+              className={`${inputCls} pl-8 ${isDemo ? 'pr-24' : ''}`}
             />
+            {isDemo && (
+              <span className="absolute right-3 top-1.5 rounded-md bg-sky-400/15 px-2 py-1 text-[10px] font-medium text-sky-300">
+                Demo data
+              </span>
+            )}
           </div>
           <button
             onClick={() => fileRef.current?.click()}
@@ -587,6 +622,10 @@ function ConfigPanel({
           <input ref={fileRef} type="file" className="hidden"
             accept=".csv,.xlsx,.xls,.json,.zip" onChange={onFileUpload} />
         </div>
+
+        {demo.description && (
+          <p className="text-xs text-slate-500">{demo.description}</p>
+        )}
 
         {datasetFileName && (
           <div className="flex items-center gap-2 rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-3 py-1.5 text-xs text-emerald-300">
@@ -723,10 +762,10 @@ export function LabEditor({ language }: { language: Language }) {
 
   const [selectedAlgo, setSelectedAlgo] = useState<AlgoId>('random_forest');
   const [params, setParams] = useState<Record<string, number | string>>(ALGO_META.random_forest.defaultParams);
-  const [datasetUrl, setDatasetUrl] = useState('');
+  const [datasetUrl, setDatasetUrl] = useState(DEMO_DATASETS.random_forest.url);
   const [datasetBase64, setDatasetBase64] = useState('');
   const [datasetFileName, setDatasetFileName] = useState<string | null>(null);
-  const [targetColumn, setTargetColumn] = useState('');
+  const [targetColumn, setTargetColumn] = useState(DEMO_DATASETS.random_forest.target);
   const [result, setResult] = useState<MLResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [elapsed, setElapsed] = useState(0);
@@ -746,6 +785,10 @@ export function LabEditor({ language }: { language: Language }) {
   const switchAlgo = (algo: AlgoId) => {
     setSelectedAlgo(algo);
     setParams(ALGO_META[algo].defaultParams);
+    setDatasetUrl(DEMO_DATASETS[algo].url);
+    setTargetColumn(DEMO_DATASETS[algo].target);
+    setDatasetBase64('');
+    setDatasetFileName(null);
     setResult(null);
     setError(null);
   };
