@@ -21,6 +21,7 @@ app.use(cors({
   origin: [
     'http://localhost:5173',
     'https://space-learning-system.vercel.app',
+    'https://space-learning-system-ngze0jc5m.vercel.app',
     process.env.FRONTEND_URL || ''
   ].filter(Boolean) 
 }));
