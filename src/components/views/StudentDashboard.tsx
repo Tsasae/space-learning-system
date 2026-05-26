@@ -1,7 +1,6 @@
 import { API_URL } from '../../config';
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  BookOpen,
   CheckCircle,
   CheckCircle2,
   ChevronDown,
@@ -9,12 +8,10 @@ import {
   Circle,
   Clock,
   Download,
-  ExternalLink,
   FlaskConical,
   Loader2,
   Paperclip,
   Send,
-  Trophy,
 } from "lucide-react";
 import { SectionHeader } from "../common/SectionHeader";
 import { STUDY_CASES, useCourseStore } from "../../store/courseStore";
@@ -105,23 +102,6 @@ const STUDY_PARTS = [
   },
 ];
 
-const EXERCISES = [
-  {
-    id: "crater-cnn",
-    title: "Exercise 1: CNN Crater Classification",
-    desc: "NASA NEO өгөгдөл дээр Random Forest ашиглан asteroid classification хийх",
-  },
-  {
-    id: "rf-vs-nn",
-    title: "Exercise 2: Random Forest vs Neural Network",
-    desc: "Crater feature дээр RF болон MLP моделийг харьцуулах",
-  },
-  {
-    id: "surrogate",
-    title: "Exercise 3: Surrogate Physics Model",
-    desc: "Физикийн тэгшитгэлийг MLPRegressor-ээр ойролцоолох",
-  },
-];
 
 // ─── Quiz Data ────────────────────────────────────────────────────────────────
 
@@ -211,6 +191,35 @@ function ProgressStepper({ completedCount }: { completedCount: number }) {
 
 // ─── Certificate card ─────────────────────────────────────────────────────────
 
+// Corner decoration: deep-blue triangle + light-blue diamond, mirrored per corner
+function CertCorner({ flipX = false, flipY = false }: { flipX?: boolean; flipY?: boolean }) {
+  return (
+    <svg
+      width="130"
+      height="130"
+      viewBox="0 0 130 130"
+      style={{
+        position: "absolute",
+        top: flipY ? "auto" : 0,
+        bottom: flipY ? 0 : "auto",
+        left: flipX ? "auto" : 0,
+        right: flipX ? 0 : "auto",
+        transform: `scale(${flipX ? -1 : 1}, ${flipY ? -1 : 1})`,
+        display: "block",
+      }}
+    >
+      {/* Main corner triangle */}
+      <polygon points="0,0 130,0 0,130" fill="#1a237e" />
+      {/* Outer light-blue diamond */}
+      <rect x="16" y="16" width="50" height="50" transform="rotate(45 41 41)" fill="#42a5f5" />
+      {/* Inner white diamond for depth */}
+      <rect x="28" y="28" width="26" height="26" transform="rotate(45 41 41)" fill="white" fillOpacity="0.7" />
+      {/* Tiny accent dot */}
+      <circle cx="10" cy="10" r="4" fill="#42a5f5" fillOpacity="0.8" />
+    </svg>
+  );
+}
+
 function CertificateCard({
   certRef,
   name,
@@ -227,125 +236,252 @@ function CertificateCard({
   courseName: string;
 }) {
   const pct = Math.round((score / total) * 100);
+
   return (
     <div
       ref={certRef as React.RefObject<HTMLDivElement>}
-      className="relative overflow-hidden rounded-[28px] p-10 text-center"
       style={{
-        background: "linear-gradient(150deg, #0a0f1e 0%, #0d1a2d 60%, #0a0f1e 100%)",
-        border: "2px solid #c9a84c",
-        boxShadow: "0 0 80px rgba(201,168,76,0.12), inset 0 0 60px rgba(201,168,76,0.04)",
-      }}
+        position: "relative",
+        overflow: "hidden",
+        background: "#ffffff",
+        borderRadius: "12px",
+        minWidth: "800px",
+        width: "100%",
+        padding: "52px 110px 44px",
+        textAlign: "center",
+        boxSizing: "border-box",
+        border: "1.5px solid #e8eaf6",
+        boxShadow: "0 4px 32px rgba(26,35,126,0.08), 0 1px 4px rgba(0,0,0,0.04)",
+        fontFamily: "Georgia, 'Times New Roman', serif",
+      } as React.CSSProperties}
     >
-      {/* Corner ornaments */}
-      {[
-        "absolute top-4 left-4 h-8 w-8 border-t-2 border-l-2 border-[#c9a84c]/60 rounded-tl-lg",
-        "absolute top-4 right-4 h-8 w-8 border-t-2 border-r-2 border-[#c9a84c]/60 rounded-tr-lg",
-        "absolute bottom-4 left-4 h-8 w-8 border-b-2 border-l-2 border-[#c9a84c]/60 rounded-bl-lg",
-        "absolute bottom-4 right-4 h-8 w-8 border-b-2 border-r-2 border-[#c9a84c]/60 rounded-br-lg",
-      ].map((cls, i) => (
-        <div key={i} className={cls} />
-      ))}
+      {/* Corner decorations */}
+      <CertCorner />
+      <CertCorner flipX />
+      <CertCorner flipY />
+      <CertCorner flipX flipY />
 
-      {/* Logo placeholder */}
-      <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full border-2 border-[#c9a84c]/60 bg-[#c9a84c]/10">
-        <span className="text-[10px] font-bold tracking-widest text-amber-300">ШУТИС</span>
-      </div>
+      {/* Inner border line */}
+      <div style={{
+        position: "absolute",
+        inset: "16px",
+        border: "1px solid #c5cae9",
+        borderRadius: "6px",
+        pointerEvents: "none",
+      }} />
 
-      <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-amber-400/80">
-        Батламж · Certificate
+      {/* ── ШУТИС ── */}
+      <p style={{
+        margin: "0 0 14px",
+        fontSize: "10px",
+        fontWeight: 700,
+        letterSpacing: "0.28em",
+        color: "#1a237e",
+        textTransform: "uppercase",
+        fontFamily: "sans-serif",
+      }}>
+        ШУТИС &nbsp;·&nbsp; ШИНЖЛЭХ УХААНЫ ТЕХНОЛОГИЙН ИХ СУРГУУЛЬ
       </p>
 
-      <Trophy className="mx-auto mt-4 h-10 w-10 text-amber-400" />
+      {/* ── CERTIFICATE ── */}
+      <h1 style={{
+        margin: "0 0 5px",
+        fontSize: "56px",
+        fontWeight: 700,
+        color: "#1a237e",
+        letterSpacing: "0.14em",
+        lineHeight: 1,
+        fontFamily: "Georgia, 'Times New Roman', serif",
+      }}>
+        CERTIFICATE
+      </h1>
 
-      <p className="mt-4 text-xs uppercase tracking-[0.25em] text-slate-400">
+      {/* ── OF COMPLETION ── */}
+      <p style={{
+        margin: "0 0 16px",
+        fontSize: "11px",
+        fontWeight: 400,
+        color: "#42a5f5",
+        letterSpacing: "0.55em",
+        textTransform: "uppercase",
+        fontFamily: "sans-serif",
+      }}>
+        OF COMPLETION
+      </p>
+
+      {/* Accent rule */}
+      <div style={{
+        width: "72px",
+        height: "2px",
+        background: "linear-gradient(90deg, transparent, #42a5f5, transparent)",
+        margin: "0 auto 18px",
+      }} />
+
+      {/* ── "Энэхүү батламжийг" ── */}
+      <p style={{
+        margin: "0 0 8px",
+        fontSize: "12px",
+        color: "#90a4ae",
+        fontFamily: "sans-serif",
+        letterSpacing: "0.03em",
+      }}>
         Энэхүү батламжийг
       </p>
-      <p className="mt-2 text-2xl font-bold text-amber-200">{name}</p>
-      <p className="mt-1 text-xs text-slate-400">-д гардуулж байна</p>
 
-      <div className="mx-auto my-5 h-px w-2/3 bg-gradient-to-r from-transparent via-[#c9a84c]/40 to-transparent" />
+      {/* ── Student name — most prominent ── */}
+      <h2 style={{
+        margin: "0 0 10px",
+        fontSize: "40px",
+        fontWeight: 700,
+        color: "#1a237e",
+        lineHeight: 1.15,
+        fontFamily: "Georgia, 'Times New Roman', serif",
+      }}>
+        {name}
+      </h2>
 
-      <p className="text-sm font-semibold text-slate-200">{courseName}</p>
-      <p className="mt-2 text-xs text-emerald-300">{caseTitle} амжилттай дүүргэлээ</p>
+      {/* ── Course / study case name ── */}
+      <p style={{
+        margin: "0 0 5px",
+        fontSize: "14px",
+        color: "#546e7a",
+        fontStyle: "italic",
+        fontFamily: "Georgia, 'Times New Roman', serif",
+      }}>
+        {courseName}
+      </p>
 
-      <div className="mx-auto mt-5 inline-flex items-center gap-2 rounded-full border border-amber-400/30 bg-amber-400/10 px-5 py-2">
-        <span className="text-lg font-bold text-amber-200">{pct}%</span>
-        <span className="text-xs text-slate-400">Quiz Score</span>
+      {/* ── Achievement line ── */}
+      <p style={{
+        margin: "0 0 18px",
+        fontSize: "12px",
+        color: "#78909c",
+        fontFamily: "sans-serif",
+      }}>
+        {caseTitle} амжилттай дүүргэлээ
+      </p>
+
+      {/* ── Quiz score badge ── */}
+      <div style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: "8px",
+        background: "#e3f2fd",
+        border: "1px solid #90caf9",
+        borderRadius: "999px",
+        padding: "6px 22px",
+        marginBottom: "20px",
+      }}>
+        <span style={{
+          fontSize: "22px",
+          fontWeight: 700,
+          color: "#1565c0",
+          fontFamily: "sans-serif",
+          lineHeight: 1,
+        }}>
+          {pct}%
+        </span>
+        <span style={{
+          fontSize: "11px",
+          color: "#42a5f5",
+          letterSpacing: "0.08em",
+          fontFamily: "sans-serif",
+        }}>
+          Quiz Score
+        </span>
       </div>
 
-      <div className="mx-auto mt-5 h-px w-2/3 bg-gradient-to-r from-transparent via-[#c9a84c]/40 to-transparent" />
+      {/* ── Decorative divider above footer ── */}
+      <div style={{
+        width: "55%",
+        height: "1px",
+        background: "linear-gradient(90deg, transparent, #c5cae9, transparent)",
+        margin: "0 auto 14px",
+      }} />
 
-      <p className="mt-4 text-xs text-slate-500">{today()}</p>
-      <p className="mt-1 text-xs text-slate-600">Issued by: Lunar Cloud LMS</p>
+      {/* ── Date ── */}
+      <p style={{
+        margin: "0 0 3px",
+        fontSize: "11px",
+        color: "#90a4ae",
+        fontFamily: "sans-serif",
+      }}>
+        {today()}
+      </p>
+
+      {/* ── Issued by ── */}
+      <p style={{
+        margin: 0,
+        fontSize: "11px",
+        color: "#b0bec5",
+        fontFamily: "sans-serif",
+        letterSpacing: "0.04em",
+      }}>
+        Issued by: Lunar Cloud LMS
+      </p>
     </div>
   );
 }
 
-// ─── Slides viewer ────────────────────────────────────────────────────────────
 
-function SlidesViewer({
-  fileUrl,
-  title,
-  label,
-}: {
-  fileUrl: string;
-  title: string;
-  label?: string;
-}) {
-  const lower = fileUrl.toLowerCase();
-  const isPDF = lower.includes(".pdf");
-  const isPPT = lower.includes(".ppt") || lower.includes(".pps");
+// ─── Material viewer (PDF / PPTX / MP4 / YouTube) ────────────────────────────
 
-  const fullUrl = fileUrl.startsWith("http") ? fileUrl : `${API_URL}${fileUrl}`;
+function MaterialViewer({ url, title }: { url: string; title: string }) {
+  const [loaded, setLoaded] = useState(false);
+  const fullUrl = url.startsWith("http") ? url : `${API_URL}${url}`;
+  const lower = fullUrl.toLowerCase().split("?")[0];
 
-  const iframeSrc = isPDF
-    ? fullUrl
-    : isPPT
-    ? `https://docs.google.com/gview?url=${encodeURIComponent(fullUrl)}&embedded=true`
-    : null;
+  const isYoutube = fullUrl.includes("youtube.com") || fullUrl.includes("youtu.be");
+  const isVideo = /\.(mp4|webm|ogg|mov)/.test(lower);
+  const isPPT = /\.(pptx?|pps)/.test(lower);
+
+  const spinner = !loaded && (
+    <div className="absolute inset-0 flex items-center justify-center bg-slate-900/60">
+      <Loader2 className="h-6 w-6 animate-spin text-sky-300" />
+    </div>
+  );
+
+  if (isYoutube) {
+    let embedUrl = fullUrl;
+    const m = fullUrl.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&?/]+)/);
+    if (m) embedUrl = `https://www.youtube.com/embed/${m[1]}`;
+    return (
+      <div className="relative w-full overflow-hidden rounded-xl" style={{ minHeight: 400 }}>
+        {spinner}
+        <iframe
+          src={embedUrl}
+          className="w-full"
+          style={{ minHeight: 400, border: "none" }}
+          title={title}
+          allowFullScreen
+          onLoad={() => setLoaded(true)}
+        />
+      </div>
+    );
+  }
+
+  if (isVideo) {
+    return (
+      <video controls className="w-full rounded-xl bg-black" style={{ minHeight: 300 }}>
+        <source src={fullUrl} />
+      </video>
+    );
+  }
+
+  const iframeSrc = isPPT
+    ? `https://docs.google.com/viewer?url=${encodeURIComponent(fullUrl)}&embedded=true`
+    : fullUrl;
 
   return (
-    <div className="relative overflow-hidden rounded-xl bg-white" style={{ height: 500 }}>
-      {/* Open-in-new-tab button */}
-      <a
-        href={fullUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="absolute right-14 top-2 z-10 inline-flex items-center gap-1 rounded-lg border border-white/20 bg-black/50 px-2.5 py-1 text-xs text-white backdrop-blur-sm transition hover:bg-black/70"
-      >
-        <ExternalLink className="h-3 w-3" />
-        Нээх
-      </a>
-
-      {iframeSrc ? (
-        <iframe
-          src={iframeSrc}
-          className="h-full w-full"
-          style={{ border: "none" }}
-          title={title}
-        />
-      ) : (
-        <div className="flex h-full items-center justify-center text-sm text-slate-400">
-          Файл харуулах боломжгүй
-        </div>
-      )}
-
-      {/* ШУТИС side badge */}
-      <div className="absolute bottom-0 right-0 top-0 flex w-11 flex-col items-center justify-center gap-2 bg-blue-900/95">
-        <img
-          src="/shutis-logo.png"
-          alt="ШУТИС"
-          className="h-8 w-8 object-contain"
-          onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
-        />
-        <span
-          className="select-none text-[9px] font-medium text-blue-200"
-          style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
-        >
-          {label ?? title}
-        </span>
-      </div>
+    <div className="relative w-full overflow-hidden rounded-xl" style={{ minHeight: 600 }}>
+      {spinner}
+      <iframe
+        src={iframeSrc}
+        className="w-full"
+        style={{ minHeight: 600, border: "none" }}
+        title={title}
+        onLoad={() => setLoaded(true)}
+      />
     </div>
   );
 }
@@ -380,10 +516,6 @@ function ComingSoonCase({ caseId }: { caseId: number }) {
 export function StudentDashboard() {
   const { id: studentId, name: studentName } = getStudentInfo();
   const { activeCase, updateProgress } = useCourseStore();
-  // Tab
-  const [activeTab, setActiveTab] = useState<"slides" | "notebook">("slides");
-  const [selectedSlideIdx, setSelectedSlideIdx] = useState(0);
-
   // Course content from API
   const [apiContent, setApiContent] = useState<ApiContentItem[]>([]);
   const [contentLoading, setContentLoading] = useState(true);
@@ -620,7 +752,7 @@ export function StudentDashboard() {
   const downloadCertificate = async () => {
     if (!certRef.current) return;
     const { default: html2canvas } = await import("html2canvas");
-    const canvas = await html2canvas(certRef.current, { scale: 2, useCORS: true, backgroundColor: null });
+    const canvas = await html2canvas(certRef.current, { scale: 2, useCORS: true, backgroundColor: "#ffffff" });
     const link = document.createElement("a");
     link.download = `certificate-${studentName.replace(/\s+/g, "-")}.png`;
     link.href = canvas.toDataURL("image/png");
@@ -636,8 +768,7 @@ export function StudentDashboard() {
   };
 
   // Derived
-  const slideItems    = apiContent.filter((i) => i.content_type === "slide");
-  const notebookItems = apiContent.filter((i) => i.content_type === "notebook");
+  const slideItems = apiContent.filter((i) => i.content_type === "slide");
   const completedCount = completedParts.size;
 
   const assignmentFiles = slideItems.map((item) => ({
@@ -678,72 +809,28 @@ export function StudentDashboard() {
               Study Case 1
             </h2>
 
-            {/* Tabs */}
-            <div className="mt-4 flex gap-2">
-              {(["slides", "notebook"] as const).map((tab) => (
-                <button
-                  key={tab}
-                  type="button"
-                  onClick={() => setActiveTab(tab)}
-                  className={`inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-medium transition-colors ${
-                    activeTab === tab
-                      ? "bg-sky-400/20 text-sky-100 ring-1 ring-sky-400/30"
-                      : "border border-white/10 bg-white/5 text-slate-400 hover:bg-white/10 hover:text-slate-200"
-                  }`}
-                >
-                  {tab === "slides" ? <BookOpen className="h-4 w-4" /> : <FlaskConical className="h-4 w-4" />}
-                  {tab === "slides" ? "Slides" : "Notebook"}
-                </button>
-              ))}
-            </div>
-
-            {/* ── Slides tab ──────────────────────────────────────────── */}
-            {activeTab === "slides" && (
-              <div className="mt-6 space-y-5">
-                {/* Instructor-uploaded slides */}
+            {/* ── LECTURE MATERIALS ─────────────────────────────────── */}
+            <div className="mt-6 space-y-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-300">LECTURE MATERIALS</p>
                 {contentLoading ? (
-                  <div className="flex items-center gap-2 py-4 text-sm text-slate-500">
-                    <Loader2 className="h-4 w-4 animate-spin" /> Уншиж байна…
-                  </div>
-                ) : slideItems.length > 0 ? (
-                  <div className="space-y-3">
-                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-300">
-                      Instructor-ийн материал
-                    </p>
-                    {/* Slide selector — show tabs when multiple slides exist */}
-                    {slideItems.length > 1 && (
-                      <div className="flex flex-wrap gap-2">
-                        {slideItems.map((item, idx) => (
-                          <button
-                            key={item.id}
-                            type="button"
-                            onClick={() => setSelectedSlideIdx(idx)}
-                            className={`rounded-xl px-3 py-1.5 text-xs font-medium transition ${
-                              selectedSlideIdx === idx
-                                ? "bg-sky-400/20 text-sky-100 ring-1 ring-sky-400/30"
-                                : "border border-white/10 bg-white/5 text-slate-400 hover:bg-white/10"
-                            }`}
-                          >
-                            {item.title}
-                          </button>
-                        ))}
+                <div className="flex items-center gap-2 py-4 text-sm text-slate-500">
+                  <Loader2 className="h-4 w-4 animate-spin" /> Уншиж байна…
+                </div>
+              ) : slideItems.length > 0 ? (
+                <div className="space-y-8">
+                  {slideItems.map((item) => {
+                    const url = item.file_url ?? item.link_url ?? "";
+                    return url ? (
+                      <div key={item.id} className="space-y-2">
+                        <p className="text-sm font-medium text-slate-300">{item.title}</p>
+                        <MaterialViewer url={url} title={item.title} />
                       </div>
-                    )}
-                    {/* Inline viewer for the selected slide */}
-                    {(() => {
-                      const item = slideItems[selectedSlideIdx] ?? slideItems[0];
-                      const url = item.file_url ?? item.link_url ?? "";
-                      return url ? (
-                        <SlidesViewer
-                          key={item.id}
-                          fileUrl={url}
-                          title={item.title}
-                          label={`Лекц №${selectedSlideIdx + 1} ${item.instructor_name ?? ""}`}
-                        />
-                      ) : null;
-                    })()}
-                  </div>
-                ) : null}
+                    ) : null;
+                  })}
+                </div>
+              ) : (
+                <p className="py-4 text-sm text-slate-500">Материал байхгүй байна</p>
+              )}
 
                 {/* ── SECTION 2: Accordion ─────────────────────────────── */}
                 <div className="space-y-2">
@@ -885,60 +972,36 @@ export function StudentDashboard() {
                     );
                   })}
                 </div>
-              </div>
-            )}
+            </div>
 
-            {/* ── Notebook tab ────────────────────────────────────────── */}
-            {activeTab === "notebook" && (
-              <div className="mt-6 space-y-4">
-                {notebookItems.length > 0 && (
-                  <div className="space-y-3">
-                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-300">
-                      Instructor-ийн notebook
-                    </p>
-                    {notebookItems.map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex items-center justify-between gap-3 rounded-[20px] border border-white/10 bg-white/5 p-4"
-                      >
-                        <div>
-                          <p className="text-sm font-medium text-slate-100">{item.title}</p>
-                          <p className="mt-0.5 text-xs text-slate-500">
-                            {item.instructor_name ?? "Instructor"} · {item.created_at.slice(0, 10)}
-                          </p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => { window.location.href = "/virtual-lab"; }}
-                          className="inline-flex shrink-0 items-center gap-1.5 rounded-2xl border border-violet-400/20 bg-violet-400/10 px-3 py-2 text-xs text-violet-200 transition hover:bg-violet-400/20"
-                        >
-                          <FlaskConical className="h-3.5 w-3.5" />
-                          Virtual Lab-д нээх
-                        </button>
-                      </div>
-                    ))}
+            {/* ── NOTEBOOK ─────────────────────────────────────────── */}
+            <div className="mt-8 space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-300">NOTEBOOK</p>
+              <div className="overflow-hidden rounded-xl border border-sky-400/20">
+                <div className="flex items-center justify-between bg-slate-800/80 px-3 py-2">
+                  <div className="flex items-center gap-3">
+                    <span className="rounded border border-green-500/30 bg-green-500/20 px-2 py-0.5 text-xs text-green-400">
+                      kernel: python 3.11
+                    </span>
+                    <span className="text-xs text-slate-500">Jupyter Notebook</span>
                   </div>
-                )}
-
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-300">
-                  Дасгал ажлууд
-                </p>
-                {EXERCISES.map((ex) => (
-                  <div key={ex.id} className="rounded-[20px] border border-white/10 bg-white/5 p-5">
-                    <p className="text-sm font-semibold text-slate-100">{ex.title}</p>
-                    <p className="mt-1 text-xs text-slate-400">{ex.desc}</p>
-                    <button
-                      type="button"
-                      onClick={() => { window.location.href = `/virtual-lab?exercise=${ex.id}`; }}
-                      className="mt-4 inline-flex items-center gap-1.5 rounded-2xl border border-violet-400/20 bg-violet-400/10 px-4 py-2 text-xs text-violet-200 transition hover:bg-violet-400/20"
-                    >
-                      <FlaskConical className="h-3.5 w-3.5" />
-                      Virtual Lab-д нээх
-                    </button>
-                  </div>
-                ))}
+                  <a
+                    href="https://jupyter.cloudlms.xyz/hub/user-redirect/lab/tree/free-experiment.ipynb"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="rounded border border-sky-500/30 bg-sky-500/20 px-3 py-1 text-xs text-sky-400 transition hover:bg-sky-500/30"
+                  >
+                    ↗ Нээх
+                  </a>
+                </div>
+                <iframe
+                  src="https://jupyter.cloudlms.xyz/hub/user-redirect/lab/tree/free-experiment.ipynb"
+                  className="w-full bg-white"
+                  style={{ height: 700, border: "none" }}
+                  title="JupyterHub Notebook"
+                />
               </div>
-            )}
+            </div>
           </div>
 
           {/* ── Assignment description ───────────────────────────────────── */}

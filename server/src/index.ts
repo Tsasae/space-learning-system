@@ -12,6 +12,7 @@ import submissionsRoutes from './routes/submissions';
 import bigqueryRoutes from './routes/bigquery';
 import coursesRoutes from './routes/courses';
 import instructorRoutes from './routes/instructor';
+import mlRoutes from './routes/ml';
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -33,6 +34,7 @@ app.use('/api/submissions', submissionsRoutes);
 app.use('/api/bigquery', bigqueryRoutes);
 app.use('/api/courses', coursesRoutes);
 app.use('/api/instructor', instructorRoutes);
+app.use('/api/ml', mlRoutes);
 app.use('/uploads', require('express').static('uploads'));
 
 app.get('/health', (_req, res) => {

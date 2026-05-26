@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { ArrowLeft, CheckCircle2, ChevronLeft, ChevronRight, Loader2, Rocket } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowLeft, CheckCircle2, ChevronLeft, ChevronRight, Loader2, LogIn, LogOut, Rocket } from "lucide-react";
 import { instructorNavItems, navigationItems } from "../../data/mockData";
 import { useTranslation } from "../../i18n/useTranslation";
 import { TranslationKey } from "../../i18n/translations";
@@ -27,6 +27,7 @@ interface SidebarProps {
   role?: UserRole;
   onSelect: (view: ViewKey) => void;
   onToggle: () => void;
+  onLogout?: () => void;
   mobile?: boolean;
 }
 
@@ -37,6 +38,7 @@ export function Sidebar({
   role,
   onSelect,
   onToggle,
+  onLogout,
   mobile = false,
 }: SidebarProps) {
   const { t } = useTranslation(language);
@@ -50,7 +52,23 @@ export function Sidebar({
     storedUser.role === "instructor" ? "Багш" :
     storedUser.role === "admin" ? "Админ" : "Welcome";
 
+  const isAuth = !!localStorage.getItem("lms_token");
+
   const navItems = role === "instructor" ? instructorNavItems : navigationItems;
+
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!dropdownOpen) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [dropdownOpen]);
 
   const { activeCase, setActiveCase, getProgressPct, isCompleted, courses, coursesLoading, fetchCourses } = useCourseStore();
 
@@ -63,9 +81,44 @@ export function Sidebar({
     } catch { /* ignore */ }
   }, [role, activeView]);
 
+  const dropdownPanel = (
+    <div className="absolute left-0 top-full z-50 mt-2 w-56 rounded-2xl border border-white/10 bg-slate-900/95 p-3 shadow-xl backdrop-blur-sm">
+      {isAuth ? (
+        <>
+          <div className="mb-3 flex items-center gap-3 rounded-xl p-2">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-sky-400/20 text-sm font-semibold text-sky-300">
+              {userName.charAt(0).toUpperCase()}
+            </div>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-medium text-slate-100">{userName}</p>
+              <p className="text-xs text-slate-400">{userRole}</p>
+            </div>
+          </div>
+          <div className="my-1 border-t border-white/10" />
+          <button
+            type="button"
+            onClick={() => { setDropdownOpen(false); onLogout?.(); }}
+            className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-red-400 transition hover:bg-red-400/10"
+          >
+            <LogOut className="h-4 w-4" />
+            Гарах
+          </button>
+        </>
+      ) : (
+        <button
+          type="button"
+          onClick={() => { setDropdownOpen(false); onLogout?.(); }}
+          className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm text-sky-300 transition hover:bg-sky-400/10"
+        >
+          <LogIn className="h-4 w-4" />
+          Нэвтрэх
+        </button>
+      )}
+    </div>
+  );
+
   // Student course environment: replace nav with study cases list
   if (role === "student" && activeView === "courses") {
-    // Use API courses when available, fall back to hardcoded STUDY_CASES
     const displayCases = courses.length > 0
       ? courses.map((c, i) => ({
           id: c.id,
@@ -85,16 +138,23 @@ export function Sidebar({
         }`}
       >
         {/* Header */}
-        <div className="flex items-center gap-3 border-b border-white/10 px-5 py-5">
-          <div className="rounded-2xl bg-sky-400/15 p-3 text-sky-300">
-            <Rocket className="h-5 w-5" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-slate-50">Хичээлийн орчин</p>
-            <p className="text-xs text-slate-400">
-              {courses.length > 0 ? `${courses.length} хичээл` : "Study Cases"}
-            </p>
-          </div>
+        <div ref={dropdownRef} className="relative border-b border-white/10">
+          <button
+            type="button"
+            onClick={() => setDropdownOpen((v) => !v)}
+            className="flex w-full items-center gap-3 px-5 py-5 transition hover:bg-white/5"
+          >
+            <div className="rounded-2xl bg-sky-400/15 p-3 text-sky-300">
+              <Rocket className="h-5 w-5" />
+            </div>
+            <div className="text-left">
+              <p className="text-sm font-semibold text-slate-50">Хичээлийн орчин</p>
+              <p className="text-xs text-slate-400">
+                {courses.length > 0 ? `${courses.length} хичээл` : "Study Cases"}
+              </p>
+            </div>
+          </button>
+          {dropdownOpen && dropdownPanel}
         </div>
 
         {/* Cases list */}
@@ -178,16 +238,23 @@ export function Sidebar({
       }`}
     >
       <div className="flex items-center justify-between border-b border-white/10 px-5 py-5">
-        <div className={`flex items-center gap-3 ${collapsed && !mobile ? "justify-center" : ""}`}>
-          <div className="rounded-2xl bg-sky-400/15 p-3 text-sky-300">
-            <Rocket className="h-5 w-5" />
-          </div>
-          {(!collapsed || mobile) && (
-            <div>
-              <p className="text-sm font-semibold text-slate-50">{userName}</p>
-              <p className="text-xs text-slate-400">{userRole}</p>
+        <div ref={dropdownRef} className="relative">
+          <button
+            type="button"
+            onClick={() => (!collapsed || mobile) && setDropdownOpen((v) => !v)}
+            className={`flex items-center gap-3 transition hover:opacity-80 ${collapsed && !mobile ? "justify-center" : ""}`}
+          >
+            <div className="rounded-2xl bg-sky-400/15 p-3 text-sky-300">
+              <Rocket className="h-5 w-5" />
             </div>
-          )}
+            {(!collapsed || mobile) && (
+              <div className="text-left">
+                <p className="text-sm font-semibold text-slate-50">{userName}</p>
+                <p className="text-xs text-slate-400">{userRole}</p>
+              </div>
+            )}
+          </button>
+          {dropdownOpen && (!collapsed || mobile) && dropdownPanel}
         </div>
         <button
           className="rounded-full border border-white/10 p-2 text-slate-300 transition hover:border-sky-300/30 hover:text-white"

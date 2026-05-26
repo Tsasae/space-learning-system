@@ -30,6 +30,7 @@ export function DashboardLayout(props: DashboardLayoutProps) {
         collapsed={props.sidebarCollapsed}
         language={props.language}
         role={props.role}
+        onLogout={props.onLogout}
         onSelect={(view) => {
           props.onViewChange(view);
           setMobileOpen(false);
@@ -47,6 +48,7 @@ export function DashboardLayout(props: DashboardLayoutProps) {
                 language={props.language}
                 role={props.role}
                 mobile
+                onLogout={props.onLogout}
                 onSelect={(view) => {
                   props.onViewChange(view);
                   setMobileOpen(false);
@@ -67,7 +69,6 @@ export function DashboardLayout(props: DashboardLayoutProps) {
           <Topbar
             language={props.language}
             onLanguageChange={props.onLanguageChange}
-            onLogout={props.onLogout}
             onMobileMenu={() => setMobileOpen(true)}
             onRoleChange={props.onRoleChange}
             onSearch={props.onSearch}

@@ -4,9 +4,7 @@ import {
   Menu,
   Moon,
   Search,
-  ShieldCheck,
   Sun,
-  UserCircle2,
 } from "lucide-react";
 import { startTransition, useDeferredValue } from "react";
 import { useTranslation } from "../../i18n/useTranslation";
@@ -21,7 +19,6 @@ interface TopbarProps {
   onRoleChange: (role: UserRole) => void;
   onLanguageChange: (language: Language) => void;
   onMobileMenu: () => void;
-  onLogout?: () => void;
   onThemeToggle: () => void;
 }
 
@@ -34,7 +31,6 @@ export function Topbar({
   onRoleChange,
   onLanguageChange,
   onMobileMenu,
-  onLogout,
   onThemeToggle,
 }: TopbarProps) {
   const deferredSearch = useDeferredValue(search);
@@ -117,21 +113,6 @@ export function Topbar({
           >
             <Bell className="h-5 w-5" />
             <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-emerald-400" />
-          </button>
-
-          <button
-            type="button"
-            onClick={onLogout}
-            className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 transition hover:bg-white/10"
-          >
-            <div className="rounded-2xl bg-emerald-300/10 p-2 text-emerald-200">
-              <ShieldCheck className="h-4 w-4" />
-            </div>
-            <div className="hidden md:block">
-              <p className="text-sm font-medium text-slate-100">Mission Lead</p>
-              <p className="text-xs text-slate-400">Space Science Operations</p>
-            </div>
-            <UserCircle2 className="h-8 w-8 text-slate-300" />
           </button>
         </div>
       </div>
