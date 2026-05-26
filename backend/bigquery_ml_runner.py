@@ -1,7 +1,22 @@
 import sys, json, os
 import pandas as pd
+from google.oauth2 import service_account
 from google.cloud import bigquery
 import uuid
+
+PROJECT_ID = os.environ.get('BIGQUERY_PROJECT_ID', 'lunar-lms-bigquery')
+DATASET_ID = os.environ.get('BIGQUERY_DATASET_ID', 'ml_models')
+
+creds_json = os.environ.get('GOOGLE_APPLICATION_CREDENTIALS_JSON')
+if creds_json:
+    creds_info = json.loads(creds_json)
+    credentials = service_account.Credentials.from_service_account_info(
+        creds_info,
+        scopes=['https://www.googleapis.com/auth/cloud-platform'],
+    )
+    client = bigquery.Client(project=PROJECT_ID, credentials=credentials)
+else:
+    client = bigquery.Client(project=PROJECT_ID)
 
 payload = json.loads(sys.stdin.read())
 algorithm = payload['algorithm']
@@ -9,12 +24,8 @@ params = payload.get('params', {})
 dataset_url = params.get('dataset_url', '')
 target_column = params.get('target_column', '')
 
-PROJECT_ID = os.environ.get('BIGQUERY_PROJECT_ID', 'lunar-lms-project')
-DATASET_ID = os.environ.get('BIGQUERY_DATASET_ID', 'ml_models')
 TABLE_ID = f"temp_data_{uuid.uuid4().hex[:8]}"
 MODEL_ID = f"temp_model_{uuid.uuid4().hex[:8]}"
-
-client = bigquery.Client(project=PROJECT_ID)
 
 # Load data
 df = pd.read_csv(dataset_url)

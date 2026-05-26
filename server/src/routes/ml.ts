@@ -20,19 +20,6 @@ const VALID_ALGORITHMS = new Set([
 // CNN is sklearn-only (TF); the rest can run on BigQuery ML
 const BQ_SUPPORTED = new Set(['random_forest', 'linear_regression', 'kmeans', 'pca']);
 
-// ── HEAD request to estimate file size (bytes) ────────────────────────────────
-async function getContentLength(url: string): Promise<number> {
-  try {
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), 5000);
-    const resp = await fetch(url, { method: 'HEAD', signal: ctrl.signal });
-    clearTimeout(t);
-    return parseInt(resp.headers.get('content-length') ?? '0', 10);
-  } catch {
-    return 0;
-  }
-}
-
 // ── Shared script runner ───────────────────────────────────────────────────────
 function runScript(
   scriptPath: string,
@@ -104,14 +91,15 @@ function runScript(
   });
 }
 
-// ── POST /api/ml/analyze — smart routing ──────────────────────────────────────
-router.post('/analyze', async (req: Request, res: Response) => {
+// ── POST /api/ml/analyze — sklearn by default, BigQuery ML on explicit request ─
+router.post('/analyze', (req: Request, res: Response) => {
   const {
     algorithm,
     dataset_url    = '',
     dataset_base64 = '',
     target_column  = '',
     params         = {},
+    engine         = '',
   } = req.body;
 
   if (!algorithm) {
@@ -129,15 +117,20 @@ router.post('/analyze', async (req: Request, res: Response) => {
     params: { dataset_url, dataset_base64, target_column, ...params },
   });
 
-  const bqConfigured = !!process.env.BIGQUERY_PROJECT_ID;
-
-  // Auto-route large remote datasets to BigQuery ML
-  // 500 KB ≈ 10 k rows at ~50 bytes/row average
-  if (dataset_url && bqConfigured && BQ_SUPPORTED.has(algorithm)) {
-    const bytes = await getContentLength(dataset_url);
-    if (bytes > 500_000) {
-      return runScript(BQ_RUNNER, payload, 'BigQuery ML', res);
+  if (engine === 'bigquery') {
+    if (!process.env.BIGQUERY_PROJECT_ID) {
+      return res.status(503).json({
+        success: false,
+        error: 'BigQuery ML not configured — set BIGQUERY_PROJECT_ID in environment',
+      });
     }
+    if (!BQ_SUPPORTED.has(algorithm)) {
+      return res.status(400).json({
+        success: false,
+        error: `BigQuery ML does not support '${algorithm}'. Supported: ${[...BQ_SUPPORTED].join(', ')}`,
+      });
+    }
+    return runScript(BQ_RUNNER, payload, 'BigQuery ML', res);
   }
 
   runScript(ML_RUNNER, payload, 'sklearn', res);
