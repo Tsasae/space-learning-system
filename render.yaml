@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: lunar-lms-api
+    env: node
+    buildCommand: cd server && npm ci && pip3 install -r ../backend/requirements.txt
+    startCommand: cd server && npm start
