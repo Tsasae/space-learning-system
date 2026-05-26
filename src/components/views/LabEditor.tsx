@@ -19,9 +19,9 @@ const PALETTE = ['#38bdf8', '#34d399', '#f59e0b', '#f87171', '#a78bfa', '#22d3ee
 
 const DEMO_DATASETS: Record<AlgoId, { url: string; target: string; description: string }> = {
   random_forest: {
-    url: 'https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv',
-    target: 'Survived',
-    description: 'Titanic — 891 зорчигчийн амьд үлдсэн эсэхийг таамаглана',
+    url: 'https://raw.githubusercontent.com/asoderlund/NEO-Analysis/main/neo_v2.csv',
+    target: 'hazardous',
+    description: 'NASA NEO — 90,000+ астероидын аюултай эсэхийг ангилна',
   },
   linear_regression: {
     url: 'https://raw.githubusercontent.com/selva86/datasets/master/BostonHousing.csv',
