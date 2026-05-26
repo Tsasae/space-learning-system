@@ -2,5 +2,5 @@ services:
   - type: web
     name: space-learning-system
     env: node
-    buildCommand: pip3 install papermill scikit-learn pandas numpy requests tensorflow && cd server && npm ci
+    buildCommand: pip3 install scikit-learn pandas numpy requests tensorflow google-cloud-bigquery db-dtypes && cd server && npm ci
     startCommand: cd server && npm start

@@ -414,6 +414,17 @@ function ResultsView({ result }: { result: MLResult }) {
     );
   }
 
+  const engine = (result as any).engine as string | undefined;
+  const engineBadge = engine ? (
+    <span className={`inline-flex items-center rounded-lg px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${
+      engine === 'BigQuery ML'
+        ? 'bg-sky-500/20 text-sky-200'
+        : 'bg-slate-400/15 text-slate-400'
+    }`}>
+      {engine === 'BigQuery ML' ? '☁ BigQuery ML' : '⚙ sklearn'}
+    </span>
+  ) : null;
+
   switch (result.algorithm) {
 
     case 'random_forest': {
@@ -421,6 +432,7 @@ function ResultsView({ result }: { result: MLResult }) {
       return (
         <div className="space-y-5">
           <div className="flex items-center gap-2">
+            {engineBadge}
             <span className={`rounded-lg px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider ${
               r.task_type === 'classification' ? 'bg-sky-400/20 text-sky-300' : 'bg-violet-400/20 text-violet-300'
             }`}>{r.task_type}</span>
@@ -445,10 +457,15 @@ function ResultsView({ result }: { result: MLResult }) {
       const r = result as LRResult;
       return (
         <div className="space-y-5">
-          {r.regularization !== 'none' && (
-            <span className="rounded-lg bg-amber-400/15 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-amber-300">
-              {r.regularization} regularization
-            </span>
+          {(engineBadge || r.regularization !== 'none') && (
+            <div className="flex items-center gap-2">
+              {engineBadge}
+              {r.regularization !== 'none' && (
+                <span className="rounded-lg bg-amber-400/15 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-amber-300">
+                  {r.regularization} regularization
+                </span>
+              )}
+            </div>
           )}
           <MetricsGrid metrics={r.metrics} />
           <div>
@@ -467,6 +484,7 @@ function ResultsView({ result }: { result: MLResult }) {
       const r = result as KMResult;
       return (
         <div className="space-y-5">
+          {engineBadge && <div>{engineBadge}</div>}
           <MetricsGrid metrics={r.metrics} />
           <div className="flex gap-1">
             {(['scatter', 'elbow', 'sizes'] as const).map(tab => (
@@ -489,6 +507,7 @@ function ResultsView({ result }: { result: MLResult }) {
       const r = result as PCAResult;
       return (
         <div className="space-y-5">
+          {engineBadge && <div>{engineBadge}</div>}
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {r.explained_variance.map((v, i) => (
               <MetricCard key={i} label={`PC${i + 1} variance`} value={v} />
@@ -510,6 +529,7 @@ function ResultsView({ result }: { result: MLResult }) {
       const r = result as CNNResult;
       return (
         <div className="space-y-5">
+          {engineBadge && <div>{engineBadge}</div>}
           <MetricsGrid metrics={r.metrics} />
           <div>
             <div className="mb-2 flex items-center justify-between">

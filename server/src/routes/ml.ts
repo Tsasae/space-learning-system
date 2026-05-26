@@ -5,60 +5,50 @@ import fs from 'fs';
 
 const router = Router();
 
-// Project root: server/src/routes/ → ../../.. = lms-websystem root
 const PROJECT_ROOT = path.resolve(__dirname, '..', '..', '..');
 const ML_RUNNER    = path.join(PROJECT_ROOT, 'backend', 'ml_runner.py');
+const BQ_RUNNER    = path.join(PROJECT_ROOT, 'backend', 'bigquery_ml_runner.py');
 const RESULT_PATH  = '/tmp/ml_result.json';
 
-// Prefer project venv python so sklearn/tensorflow are available
-const VENV_PYTHON = path.join(PROJECT_ROOT, '.venv', 'bin', 'python3');
-const PYTHON_BIN  = fs.existsSync(VENV_PYTHON) ? VENV_PYTHON : 'python3';
+const VENV_PYTHON  = path.join(PROJECT_ROOT, '.venv', 'bin', 'python3');
+const PYTHON_BIN   = fs.existsSync(VENV_PYTHON) ? VENV_PYTHON : 'python3';
 
 const VALID_ALGORITHMS = new Set([
-  'random_forest',
-  'linear_regression',
-  'kmeans',
-  'pca',
-  'cnn',
+  'random_forest', 'linear_regression', 'kmeans', 'pca', 'cnn',
 ]);
 
-// POST /api/ml/analyze
-router.post('/analyze', (req: Request, res: Response) => {
-  const {
-    algorithm,
-    dataset_url    = '',
-    dataset_base64 = '',
-    target_column  = '',
-    params         = {},
-  } = req.body;
+// CNN is sklearn-only (TF); the rest can run on BigQuery ML
+const BQ_SUPPORTED = new Set(['random_forest', 'linear_regression', 'kmeans', 'pca']);
 
-  if (!algorithm) {
-    return res.status(400).json({ success: false, error: 'algorithm is required' });
+// ── HEAD request to estimate file size (bytes) ────────────────────────────────
+async function getContentLength(url: string): Promise<number> {
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 5000);
+    const resp = await fetch(url, { method: 'HEAD', signal: ctrl.signal });
+    clearTimeout(t);
+    return parseInt(resp.headers.get('content-length') ?? '0', 10);
+  } catch {
+    return 0;
   }
-  if (!VALID_ALGORITHMS.has(algorithm)) {
-    return res.status(400).json({
-      success: false,
-      error: `Unknown algorithm '${algorithm}'. Valid: ${[...VALID_ALGORITHMS].join(', ')}`,
-    });
-  }
+}
 
-  const payload = JSON.stringify({
-    algorithm,
-    params: { dataset_url, dataset_base64, target_column, ...params },
-  });
-
-  // Remove stale result so we don't accidentally return an old one
+// ── Shared script runner ───────────────────────────────────────────────────────
+function runScript(
+  scriptPath: string,
+  payload: string,
+  engine: string,
+  res: Response,
+): void {
   if (fs.existsSync(RESULT_PATH)) {
     try { fs.unlinkSync(RESULT_PATH); } catch (_) {}
   }
 
-  const py = spawn(PYTHON_BIN, [ML_RUNNER], { cwd: PROJECT_ROOT });
-
+  const py = spawn(PYTHON_BIN, [scriptPath], { cwd: PROJECT_ROOT });
   let stdout = '';
   let stderr = '';
   let responded = false;
 
-  // 5-minute hard timeout (ML training can be slow)
   const timer = setTimeout(() => {
     if (!responded) {
       responded = true;
@@ -86,29 +76,23 @@ router.post('/analyze', (req: Request, res: Response) => {
     if (responded) return;
     responded = true;
 
-    // Prefer the result file (written inside the notebook)
     if (fs.existsSync(RESULT_PATH)) {
       try {
         const result = JSON.parse(fs.readFileSync(RESULT_PATH, 'utf8'));
-        if (result.error) {
-          return res.status(500).json({ success: false, ...result });
-        }
-        return res.json({ success: true, result });
-      } catch (parseErr: any) {
-        return res.status(500).json({ success: false, error: `Invalid JSON in result: ${parseErr.message}` });
+        if (result.error) return res.status(500).json({ success: false, ...result });
+        return res.json({ success: true, result: { ...result, engine } });
+      } catch (e: any) {
+        return res.status(500).json({ success: false, error: `Invalid JSON in result: ${e.message}` });
       }
     }
 
-    // Fall back to stdout (last JSON line)
     const lines = stdout.trim().split('\n').filter(Boolean);
     const lastLine = lines[lines.length - 1];
     if (lastLine) {
       try {
         const result = JSON.parse(lastLine);
-        if (result.error) {
-          return res.status(500).json({ success: false, ...result });
-        }
-        return res.json({ success: true, result });
+        if (result.error) return res.status(500).json({ success: false, ...result });
+        return res.json({ success: true, result: { ...result, engine } });
       } catch (_) {}
     }
 
@@ -118,16 +102,90 @@ router.post('/analyze', (req: Request, res: Response) => {
       stderr: stderr.slice(0, 1000),
     });
   });
+}
+
+// ── POST /api/ml/analyze — smart routing ──────────────────────────────────────
+router.post('/analyze', async (req: Request, res: Response) => {
+  const {
+    algorithm,
+    dataset_url    = '',
+    dataset_base64 = '',
+    target_column  = '',
+    params         = {},
+  } = req.body;
+
+  if (!algorithm) {
+    return res.status(400).json({ success: false, error: 'algorithm is required' });
+  }
+  if (!VALID_ALGORITHMS.has(algorithm)) {
+    return res.status(400).json({
+      success: false,
+      error: `Unknown algorithm '${algorithm}'. Valid: ${[...VALID_ALGORITHMS].join(', ')}`,
+    });
+  }
+
+  const payload = JSON.stringify({
+    algorithm,
+    params: { dataset_url, dataset_base64, target_column, ...params },
+  });
+
+  const bqConfigured = !!process.env.BIGQUERY_PROJECT_ID;
+
+  // Auto-route large remote datasets to BigQuery ML
+  // 500 KB ≈ 10 k rows at ~50 bytes/row average
+  if (dataset_url && bqConfigured && BQ_SUPPORTED.has(algorithm)) {
+    const bytes = await getContentLength(dataset_url);
+    if (bytes > 500_000) {
+      return runScript(BQ_RUNNER, payload, 'BigQuery ML', res);
+    }
+  }
+
+  runScript(ML_RUNNER, payload, 'sklearn', res);
 });
 
-// GET /api/ml/algorithms — list supported algorithms
+// ── POST /api/ml/analyze-bigquery — explicit BigQuery ML ──────────────────────
+router.post('/analyze-bigquery', (req: Request, res: Response) => {
+  if (!process.env.BIGQUERY_PROJECT_ID) {
+    return res.status(503).json({
+      success: false,
+      error: 'BigQuery ML not configured — set BIGQUERY_PROJECT_ID in environment',
+    });
+  }
+
+  const {
+    algorithm,
+    dataset_url    = '',
+    dataset_base64 = '',
+    target_column  = '',
+    params         = {},
+  } = req.body;
+
+  if (!algorithm) {
+    return res.status(400).json({ success: false, error: 'algorithm is required' });
+  }
+  if (!BQ_SUPPORTED.has(algorithm)) {
+    return res.status(400).json({
+      success: false,
+      error: `BigQuery ML does not support '${algorithm}'. Supported: ${[...BQ_SUPPORTED].join(', ')}`,
+    });
+  }
+
+  const payload = JSON.stringify({
+    algorithm,
+    params: { dataset_url, dataset_base64, target_column, ...params },
+  });
+
+  runScript(BQ_RUNNER, payload, 'BigQuery ML', res);
+});
+
+// ── GET /api/ml/algorithms ─────────────────────────────────────────────────────
 router.get('/algorithms', (_req: Request, res: Response) => {
   res.json({
     success: true,
     algorithms: [
-      { id: 'random_forest',    label: 'Random Forest',     task: 'classification/regression' },
-      { id: 'linear_regression',label: 'Linear Regression', task: 'regression'                },
-      { id: 'kmeans',           label: 'K-Means Clustering', task: 'clustering'               },
+      { id: 'random_forest',    label: 'Random Forest',      task: 'classification/regression' },
+      { id: 'linear_regression',label: 'Linear Regression',  task: 'regression'                },
+      { id: 'kmeans',           label: 'K-Means Clustering', task: 'clustering'                },
       { id: 'pca',              label: 'PCA Analysis',       task: 'dimensionality_reduction'  },
       { id: 'cnn',              label: 'CNN Classifier',     task: 'image_classification'      },
     ],
