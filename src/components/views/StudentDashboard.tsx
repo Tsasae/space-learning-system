@@ -574,12 +574,29 @@ export function StudentDashboard() {
     const raw = currentCourseData?.quiz;
     const questions = Array.isArray(raw) ? raw : raw?.questions;
     if (!questions || !Array.isArray(questions) || questions.length === 0) return QUIZ_QUESTIONS;
-    return questions.map((q: any, i: number) => ({
-      id: i + 1,
-      q: q.question ?? q.q ?? `Question ${i + 1}`,
-      opts: (q.options ?? q.opts ?? []) as string[],
-      correct: typeof q.correct === "number" ? q.correct : 0,
-    }));
+    return questions.map((q: any, i: number) => {
+      const rawOpts = q.options ?? q.opts ?? [];
+      // Option нь {text,isCorrect} объект ЭСВЭЛ энгийн string байж болно
+      const opts: string[] = (rawOpts as any[]).map((o) =>
+        typeof o === "string" ? o : (o?.text ?? "")
+      );
+      // Зөв хариултын индекс: хуучин формат q.correct, эсвэл объектын isCorrect-аас
+      let correct = 0;
+      if (typeof q.correct === "number") {
+        correct = q.correct;
+      } else {
+        const idx = (rawOpts as any[]).findIndex(
+          (o) => o && typeof o === "object" && o.isCorrect
+        );
+        correct = idx >= 0 ? idx : 0;
+      }
+      return {
+        id: i + 1,
+        q: q.question ?? q.q ?? q.text ?? `Асуулт ${i + 1}`,
+        opts,
+        correct,
+      };
+    });
   }, [currentCourseData]);
 
   const quizPassed = quizScore !== null && quizScore / activeQuizQs.length >= 0.75;
