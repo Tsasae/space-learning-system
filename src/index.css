@@ -169,3 +169,52 @@ body.light nav {
   background-color: rgba(255, 255, 255, 0.95) !important;
   border-color: rgba(0, 0, 0, 0.1) !important;
 }
+
+/* ============================================================
+   LIGHT THEME — accent текстийн өнгөний нэмэлт override
+   WCAG AA контраст (≥4.5:1) хангасан.
+   ============================================================ */
+
+/* ── Slate ── */
+body.light .text-slate-600 { color: #475569 !important; }
+body.light .text-slate-700 { color: #334155 !important; }
+
+/* ── Emerald / Green ── */
+body.light .text-emerald-100 { color: #065f46 !important; }
+body.light .text-emerald-200 { color: #065f46 !important; }
+body.light .text-emerald-300 { color: #047857 !important; }
+body.light .text-emerald-400 { color: #047857 !important; }
+body.light .text-green-400   { color: #15803d !important; }
+
+/* ── Amber ── */
+body.light .text-amber-100 { color: #92400e !important; }
+body.light .text-amber-200 { color: #92400e !important; }
+body.light .text-amber-300 { color: #b45309 !important; }
+body.light .text-amber-400 { color: #b45309 !important; }
+
+/* ── Rose / Red ── */
+body.light .text-rose-300 { color: #be123c !important; }
+body.light .text-rose-400 { color: #be123c !important; }
+body.light .text-red-200  { color: #b91c1c !important; }
+body.light .text-red-300  { color: #b91c1c !important; }
+body.light .text-red-400  { color: #b91c1c !important; }
+
+/* ── Violet ── */
+body.light .text-violet-200 { color: #6d28d9 !important; }
+body.light .text-violet-300 { color: #6d28d9 !important; }
+body.light .text-violet-400 { color: #6d28d9 !important; }
+
+/* ── Opacity бүхий accent текст ── */
+body.light .text-sky-300\/70  { color: #0284c7 !important; }
+body.light .text-sky-200\/80  { color: #0369a1 !important; }
+body.light .text-red-300\/80  { color: #b91c1c !important; }
+
+/* ── Badge/chip дэвсгэр ── */
+body.light .bg-emerald-400\/10 { background-color: #d1fae5 !important; }
+body.light .bg-emerald-300\/10 { background-color: #d1fae5 !important; }
+body.light .bg-amber-400\/10   { background-color: #fef3c7 !important; }
+body.light .bg-amber-300\/10   { background-color: #fef3c7 !important; }
+body.light .bg-violet-400\/10  { background-color: #ede9fe !important; }
+body.light .bg-red-400\/10     { background-color: #fee2e2 !important; }
+body.light .bg-rose-400\/10    { background-color: #ffe4e6 !important; }
+body.light .bg-red-400\/8      { background-color: #fee2e2 !important; }
