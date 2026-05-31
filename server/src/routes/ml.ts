@@ -185,4 +185,19 @@ router.get('/algorithms', (_req: Request, res: Response) => {
   });
 });
 
+// ── POST /api/ml/predict — сурсан загвараар шинэ өгөгдөл дээр прогноз гаргах ─────
+router.post('/predict', (req: Request, res: Response) => {
+  const { model_id, features } = req.body;
+
+  if (!model_id) {
+    return res.status(400).json({ success: false, error: 'model_id шаардлагатай' });
+  }
+  if (!features || typeof features !== 'object' || Array.isArray(features)) {
+    return res.status(400).json({ success: false, error: 'features (object) шаардлагатай' });
+  }
+
+  const payload = JSON.stringify({ mode: 'predict', model_id, features });
+  runScript(ML_RUNNER, payload, 'sklearn-predict', res);
+});
+
 export default router;

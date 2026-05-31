@@ -1,6 +1,7 @@
-import sys, json, io, base64
+import sys, json, io, base64, os, uuid
 import pandas as pd
 import numpy as np
+import joblib
 from sklearn.ensemble import RandomForestClassifier, RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.cluster import KMeans
@@ -9,6 +10,20 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score, r2_score, mean_squared_error
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.metrics import silhouette_score
+
+# ── Сурсан загваруудыг хадгалах хавтас (predict-д дахин ачаална) ────────────────
+MODEL_DIR = os.environ.get('ML_MODEL_DIR', '/tmp/ml_models')
+os.makedirs(MODEL_DIR, exist_ok=True)
+
+
+def save_model(model, feature_names, task_type):
+    """Сурсан загварыг диск рүү хадгалж, model_id буцаана."""
+    model_id = str(uuid.uuid4())
+    joblib.dump(
+        {'model': model, 'features': list(feature_names), 'task_type': task_type},
+        os.path.join(MODEL_DIR, f'{model_id}.joblib'),
+    )
+    return model_id
 
 
 def load_data(params):
@@ -40,6 +55,56 @@ def preprocess(df):
 
 
 payload = json.loads(sys.stdin.read())
+
+# ════════════════════════════════════════════════════════════════════════════════
+# PREDICT MODE — сурсан загвараар шинэ өгөгдөл дээр прогноз гаргах
+# payload = { "mode": "predict", "model_id": "...", "features": {col: value, ...} }
+# ════════════════════════════════════════════════════════════════════════════════
+if payload.get('mode') == 'predict':
+    model_id = payload.get('model_id', '')
+    feats = payload.get('features', {})
+    model_path = os.path.join(MODEL_DIR, f'{model_id}.joblib')
+
+    if not model_id or not os.path.exists(model_path):
+        print(json.dumps({'error': 'Загвар олдсонгүй. Эхлээд сургалт явуулна уу.'}))
+        sys.exit(0)
+
+    bundle = joblib.load(model_path)
+    model = bundle['model']
+    columns = bundle['features']
+    task_type = bundle.get('task_type', 'classification')
+
+    try:
+        row = [float(feats[c]) for c in columns]
+    except (KeyError, ValueError, TypeError) as e:
+        print(json.dumps({'error': f'Feature утга дутуу/буруу байна: {e}'}))
+        sys.exit(0)
+
+    X = pd.DataFrame([row], columns=columns)
+    pred = model.predict(X)[0]
+
+    out = {
+        'mode': 'predict',
+        'task_type': task_type,
+        'prediction': round(float(pred), 4) if task_type == 'regression' else int(pred),
+        'feature_names': columns,
+    }
+
+    # Ангиллын хувьд анги тус бүрийн магадлал
+    if task_type == 'classification' and hasattr(model, 'predict_proba'):
+        proba = model.predict_proba(X)[0]
+        classes = model.classes_
+        out['probabilities'] = [
+            {'class': int(c), 'probability': round(float(p), 4)}
+            for c, p in zip(classes, proba)
+        ]
+
+    print(json.dumps(out))
+    sys.exit(0)
+
+# ════════════════════════════════════════════════════════════════════════════════
+# TRAIN MODE (анхдагч) — өмнөх үйлдэл хэвээр, дээр нь загвар хадгалалт нэмэгдсэн
+# ════════════════════════════════════════════════════════════════════════════════
 algorithm = payload['algorithm']
 params = payload.get('params', {})
 target_column = params.get('target_column', '')
@@ -78,6 +143,9 @@ if algorithm == 'random_forest':
                 for col, imp in zip(X.columns, model.feature_importances_)
             ], key=lambda x: -x['importance'])[:10],
         }
+        # ── ШИНЭ: загвар хадгалах → prediction боломжтой болгох ──
+        result['model_id'] = save_model(model, X.columns, 'classification')
+        result['feature_names'] = list(X.columns)
     else:
         model = RandomForestRegressor(n_estimators=100, random_state=42)
         model.fit(X_train, y_train)
@@ -95,6 +163,9 @@ if algorithm == 'random_forest':
                 for col, imp in zip(X.columns, model.feature_importances_)
             ], key=lambda x: -x['importance'])[:10],
         }
+        # ── ШИНЭ: загвар хадгалах ──
+        result['model_id'] = save_model(model, X.columns, 'regression')
+        result['feature_names'] = list(X.columns)
 
 elif algorithm == 'linear_regression':
     if target_column and target_column in df.columns:
@@ -123,6 +194,9 @@ elif algorithm == 'linear_regression':
             for a, p in zip(list(y_test)[:50], list(y_pred)[:50])
         ]
     }
+    # ── ШИНЭ: загвар хадгалах ──
+    result['model_id'] = save_model(model, X.columns, 'regression')
+    result['feature_names'] = list(X.columns)
 
 elif algorithm == 'kmeans':
     X = df.select_dtypes(include=[np.number])

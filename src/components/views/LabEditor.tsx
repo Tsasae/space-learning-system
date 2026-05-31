@@ -12,6 +12,7 @@ import { useTranslation } from '../../i18n/useTranslation';
 import { Language } from '../../types';
 import { SectionHeader } from '../common/SectionHeader';
 import { API_URL } from '../../config';
+import PredictionPanel from './PredictionPanel';
 
 // ─── Constants ─────────────────────────────────────────────────────────────────
 
@@ -55,12 +56,16 @@ interface RFResult {
   feature_importance: { feature: string; importance: number }[];
   confusion_matrix?: number[][];
   sample_predictions: { actual: number; predicted: number }[];
+  model_id?: string;
+  feature_names?: string[];
 }
 interface LRResult {
   algorithm: 'linear_regression'; regularization: string;
   metrics: Record<string, number>;
   coefficients: { feature: string; coefficient: number }[];
   predicted_vs_actual: { actual: number; predicted: number }[];
+  model_id?: string;
+  feature_names?: string[];
 }
 interface KMResult {
   algorithm: 'kmeans'; n_clusters: number;
@@ -999,6 +1004,18 @@ export function LabEditor({ language }: { language: Language }) {
             )}
 
             {!loading && !error && result && <ResultsView result={result} />}
+
+            {!loading && !error && result &&
+              (result.algorithm === 'random_forest' || result.algorithm === 'linear_regression') &&
+              result.model_id && (
+                <div className="mt-6">
+                  <PredictionPanel
+                    modelId={result.model_id}
+                    featureNames={result.feature_names ?? []}
+                    taskType={result.algorithm === 'random_forest' ? result.task_type : 'regression'}
+                  />
+                </div>
+            )}
 
             {!loading && !error && !result && (
               <div className="flex flex-col items-center justify-center gap-3 py-20">
