@@ -1,5 +1,7 @@
 import { API_URL } from '../../config';
 import { useEffect, useState } from "react";
+import { useProgressTracking } from '../../hooks/useProgressTracking';
+import { LiveProgressBar } from '../common/LiveProgressBar';
 import { ChevronDown, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 import { SectionHeader } from "../common/SectionHeader";
 
@@ -371,11 +373,28 @@ export function CourseEnvironment() {
       .finally(() => setCoursesLoading(false));
   }, []);
 
+  // Студентийн id-г localStorage-аас
+  const studentId = (() => {
+    try { return JSON.parse(localStorage.getItem('lms_user') || '{}').id as string; }
+    catch { return undefined; }
+  })();
+  const activeCourse = publishedCourses[0];
+  const courseId = activeCourse?.id as number | undefined;
+
+  // Hook-г early return-оос ӨМНӨ дуудах (React дүрэм)
+  const { progress, markSlideSeen } = useProgressTracking(studentId, courseId);
+
+  // Slide солигдох бүрт 3 сек timer эхлүүлнэ
+  useEffect(() => {
+    const stop = markSlideSeen(`${activePart}-${slideIndex}`);
+    return stop;
+  }, [activePart, slideIndex, markSlideSeen]);
+
   if (!coursesLoading && publishedCourses.length === 0) {
     return (
       <div className="flex h-64 items-center justify-center text-center">
         <div>
-          <p className="text-4xl">📚</p>
+          <p className="text-4xl"></p>
           <p className="mt-3 font-medium text-white">Одоогоор хичээл байхгүй байна</p>
           <p className="mt-1 text-sm text-slate-400">
             Багш хичээл оруулсны дараа энд харагдана
@@ -385,10 +404,12 @@ export function CourseEnvironment() {
     );
   }
 
-  const part = PARTS[activePart];
+  const parts: Part[] = (Array.isArray(activeCourse?.parts) && activeCourse.parts.length > 0)
+    ? activeCourse.parts as Part[]
+    : PARTS;
+  const part = parts[activePart];
   const slide = part.slides[slideIndex];
   const totalSlides = part.slides.length;
-  const progress = ((slideIndex + 1) / totalSlides) * 100;
 
   function goToPart(index: number) {
     setActivePart(index);

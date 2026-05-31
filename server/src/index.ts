@@ -13,6 +13,7 @@ import bigqueryRoutes from './routes/bigquery';
 import coursesRoutes from './routes/courses';
 import instructorRoutes from './routes/instructor';
 import mlRoutes from './routes/ml';
+import progressRoutes from './routes/progress';
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -36,6 +37,7 @@ app.use('/api/bigquery', bigqueryRoutes);
 app.use('/api/courses', coursesRoutes);
 app.use('/api/instructor', instructorRoutes);
 app.use('/api/ml', mlRoutes);
+app.use('/api/progress', progressRoutes);
 app.use('/uploads', require('express').static('uploads'));
 
 app.get('/health', (_req, res) => {
@@ -120,6 +122,18 @@ async function runMigrations() {
         completed_at TIMESTAMPTZ,
         UNIQUE(student_id, part_number)
       )
+    `);
+
+    // Live progress tracking columns (added after initial release)
+    await pool.query(`
+      ALTER TABLE course_progress
+        ADD COLUMN IF NOT EXISTS seen_slides JSONB DEFAULT '[]'::jsonb,
+        ADD COLUMN IF NOT EXISTS progress_percent DECIMAL(5,2) DEFAULT 0,
+        ADD COLUMN IF NOT EXISTS last_activity_at TIMESTAMPTZ
+    `);
+    await pool.query(`
+      CREATE INDEX IF NOT EXISTS idx_progress_activity
+        ON course_progress(course_id, last_activity_at DESC)
     `);
 
     console.log('✅ Database migrations completed');

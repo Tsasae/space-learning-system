@@ -944,7 +944,7 @@ export function InstructorDashboard() {
                 {slides.length > 0 && (
                   <div className="space-y-3">
                     <p className="text-xs font-semibold uppercase tracking-widest text-slate-500">
-                      📄 Slides &amp; Documents ({slides.length})
+                       Slides &amp; Documents ({slides.length})
                     </p>
                     {slides.map((item) => (
                       <SlideCard key={item.id} item={item} onDelete={handleDelete} />
@@ -954,7 +954,7 @@ export function InstructorDashboard() {
                 {notebooks.length > 0 && (
                   <div className="space-y-3">
                     <p className="text-xs font-semibold uppercase tracking-widest text-slate-500">
-                      📓 Jupyter Notebooks ({notebooks.length})
+                       Jupyter Notebooks ({notebooks.length})
                     </p>
                     {notebooks.map((item) => (
                       <NotebookCard key={item.id} item={item} onDelete={handleDelete} />
@@ -964,7 +964,7 @@ export function InstructorDashboard() {
                 {nasa.length > 0 && (
                   <div className="space-y-3">
                     <p className="text-xs font-semibold uppercase tracking-widest text-slate-500">
-                      🌍 NASA Datasets ({nasa.length})
+                       NASA Datasets ({nasa.length})
                     </p>
                     {nasa.map((item) => (
                       <NasaCard key={item.id} item={item} onDelete={handleDelete} />
