@@ -14,6 +14,7 @@ import MyCourses from "./pages/instructor/MyCourses";
 import StudentsPage from "./pages/instructor/Students";
 import { StudentDashboard } from "./components/views/StudentDashboard";
 import { StudentDashboardHome } from "./components/views/StudentDashboardHome";
+import InstructorHome from "./components/dashboards/InstructorHome";
 import { useUIStore } from "./store/uiStore";
 import { AuthUser, ViewKey } from "./types";
 
@@ -79,6 +80,7 @@ function App() {
     switch (view) {
       case "dashboard":
         if (role === 'student') return <StudentDashboardHome />;
+        if (role === 'instructor') return <InstructorHome />;
         return <RoleDashboard role={role} />;
       case "courses":
         if (role === 'instructor' || role === 'admin') return <InstructorDashboard />;
