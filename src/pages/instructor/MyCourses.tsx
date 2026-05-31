@@ -368,8 +368,8 @@ function CourseListView({
     const ctrl = new AbortController();
     fetch(`${API_URL}/api/instructor/courses`, { signal: ctrl.signal })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((d) => setCourses(d.courses ?? MOCK_COURSES))
-      .catch(() => setCourses(MOCK_COURSES))
+      .then((d) => setCourses(d.courses ?? []))
+      .catch(() => setCourses([]))
       .finally(() => setLoading(false));
     return () => ctrl.abort();
   }, []);

@@ -482,7 +482,7 @@ export default function CreateCourse() {
     if (!validate()) return;
     setPublishing(true);
     try {
-      await fetch(`${API_URL}/api/courses`, {
+      const res = await fetch(`${API_URL}/api/courses`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -492,11 +492,19 @@ export default function CreateCourse() {
           parts,
           assignment: { name: assName, description: assDesc, dueDate, minAccuracy },
           quiz: { questions, passThreshold, timeLimit },
+          published: true,
         }),
       });
-    } catch { /* server may be offline */ }
-    setPublishing(false);
-    setPublished(true);
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || `Сервер алдаа (${res.status})`);
+      }
+      setPublished(true);
+    } catch (err) {
+      alert("Хичээл хадгалахад алдаа гарлаа: " + (err as Error).message);
+    } finally {
+      setPublishing(false);
+    }
   };
 
   // ── part helpers ────────────────────────────────────────────────────────────
