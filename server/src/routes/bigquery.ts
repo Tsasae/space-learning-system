@@ -1,5 +1,6 @@
 import { Router, Request, Response } from 'express';
 import { BigQuery } from '@google-cloud/bigquery';
+import { cache } from '../middleware/cache';
 
 const router = Router();
 
@@ -24,7 +25,7 @@ if (process.env.GOOGLE_CREDENTIALS_BASE64) {
 }
 
 // Нийт статистик
-router.get('/stats', async (req: Request, res: Response) => {
+router.get('/stats', cache(900), async (req: Request, res: Response) => {
   try {
     const query = `
       SELECT 
@@ -45,18 +46,21 @@ router.get('/stats', async (req: Request, res: Response) => {
 });
 
 // Өгөгдөл татах
-router.get('/wildfire', async (req: Request, res: Response) => {
+router.get('/wildfire', cache(900), async (req: Request, res: Response) => {
   try {
     const limit = parseInt(req.query.limit as string) || 1000;
     const confidence = req.query.confidence as string || 'high';
-    
+
     const query = `
       SELECT latitude, longitude, bright_ti4, confidence, acq_date, satellite
       FROM \`bigquery-public-data.nasa_wildfire.past_week\`
-      WHERE confidence = '${confidence}'
-      LIMIT ${limit}
+      WHERE confidence = @confidence
+      LIMIT @limit
     `;
-    const [rows] = await bigquery.query(query);
+    const [rows] = await bigquery.query({
+      query,
+      params: { confidence, limit },
+    });
     res.json({ success: true, count: rows.length, data: rows });
   } catch (error: any) {
     res.status(500).json({ success: false, error: error.message });
@@ -81,10 +85,8 @@ router.get('/ml-results', async (req: Request, res: Response) => {
   }
 });
 
-export default router;
-
 // Landsat 9.6M бичлэг статистик
-router.get('/landsat-stats', async (req: Request, res: Response) => {
+router.get('/landsat-stats', cache(3600), async (req: Request, res: Response) => {
   try {
     const query = `
       SELECT 
@@ -129,7 +131,7 @@ router.get('/landsat-ml', async (req: Request, res: Response) => {
 });
 
 // Landsat дагуул бүрийн статистик
-router.get('/landsat-by-satellite', async (req: Request, res: Response) => {
+router.get('/landsat-by-satellite', cache(3600), async (req: Request, res: Response) => {
   try {
     const query = `
       SELECT spacecraft_id,
@@ -152,14 +154,9 @@ router.get('/landsat-by-satellite', async (req: Request, res: Response) => {
 router.get('/landsat-raw', async (req, res) => {
   try {
     const query = `
-      SELECT 
-        cloud_cover,
-        north_lat,
-        south_lat,
-        east_lon,
-        west_lon
+      SELECT cloud_cover, north_lat, south_lat, east_lon, west_lon
       FROM \`bigquery-public-data.cloud_storage_geo_index.landsat_index\`
-      WHERE cloud_cover IS NOT NULL
+      WHERE cloud_cover IS NOT NULL AND RAND() < 0.001
       LIMIT 5000
     `;
     const [rows] = await bigquery.query(query);
@@ -168,3 +165,5 @@ router.get('/landsat-raw', async (req, res) => {
     res.status(500).json({ success: false, error: err.message });
   }
 });
+
+export default router;
