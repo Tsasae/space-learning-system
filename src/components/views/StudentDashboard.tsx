@@ -15,6 +15,8 @@ import {
 } from "lucide-react";
 import { SectionHeader } from "../common/SectionHeader";
 import { STUDY_CASES, useCourseStore } from "../../store/courseStore";
+import { useUIStore } from "../../store/uiStore";
+import { useTranslation } from "../../i18n/useTranslation";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -514,6 +516,8 @@ function ComingSoonCase({ caseId }: { caseId: number }) {
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export function StudentDashboard() {
+  const { language } = useUIStore();
+  const { t } = useTranslation(language);
   const { id: studentId, name: studentName } = getStudentInfo();
   const { activeCase, updateProgress } = useCourseStore();
   // Course content from API
@@ -783,7 +787,7 @@ export function StudentDashboard() {
   return (
     <section className="space-y-6">
       <SectionHeader
-        eyebrow="STUDENT VIEW"
+        eyebrow={t("studentView")}
         title="AI for Lunar Formation & Structure"
         description="Case 1 — Material үзэх, дасгал илгээх, quiz өгөх, батламж авах."
       />
@@ -811,7 +815,7 @@ export function StudentDashboard() {
 
             {/* ── LECTURE MATERIALS ─────────────────────────────────── */}
             <div className="mt-6 space-y-6">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-300">LECTURE MATERIALS</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-300">{t("lectureMatarials")}</p>
                 {contentLoading ? (
                 <div className="flex items-center gap-2 py-4 text-sm text-slate-500">
                   <Loader2 className="h-4 w-4 animate-spin" /> Уншиж байна…
@@ -835,7 +839,7 @@ export function StudentDashboard() {
                 {/* ── SECTION 2: Accordion ─────────────────────────────── */}
                 <div className="space-y-2">
                   <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-300">
-                    Study Case 1 — Лекцийн агуулга
+                    {t("studyCase")} 1 — {t("lectureContent")}
                   </p>
                   {activeParts.map((part) => {
                     const done = completedParts.has(part.number);
@@ -963,7 +967,7 @@ export function StudentDashboard() {
                                 ) : (
                                   <CheckCircle className="h-3.5 w-3.5" />
                                 )}
-                                Дууссан гэж тэмдэглэх
+                                {t("markAsDone")}
                               </button>
                             )}
                           </div>
@@ -1214,9 +1218,9 @@ export function StudentDashboard() {
           {/* ── SECTION 3: Exercise submission ───────────────────────────── */}
           <div className="glass-panel rounded-[28px] p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-300">
-              Дасгал илгээх
+              {t("submitExercise")}
             </p>
-            <h3 className="mt-1 text-base font-semibold text-slate-100">Exercise Submission</h3>
+            <h3 className="mt-1 text-base font-semibold text-slate-100">{t("submitExercise")}</h3>
 
             {exerciseSubmitted && !submitSuccess ? (
               <div className="mt-4 space-y-3">
@@ -1492,7 +1496,7 @@ export function StudentDashboard() {
           {/* Overall progress */}
           <div className="glass-panel rounded-[28px] p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-300">
-              Learning Progress
+              {t("learningProgress")}
             </p>
             <div className="mt-4 flex items-center gap-3">
               <div className="h-2 flex-1 overflow-hidden rounded-full bg-white/10">
@@ -1574,7 +1578,7 @@ export function StudentDashboard() {
           {/* Next steps */}
           <div className="glass-panel rounded-[28px] p-6">
             <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-300">
-              Next Steps
+              {t("nextSteps")}
             </p>
             <div className="mt-4 space-y-2">
               {!exerciseSubmitted && (

@@ -25,6 +25,7 @@ import {
 } from "lucide-react";
 import { SectionHeader } from "../common/SectionHeader";
 import { useUIStore } from "../../store/uiStore";
+import { useTranslation } from "../../i18n/useTranslation";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -814,7 +815,8 @@ const STUDY_CASES = [
 // ─── Main component ────────────────────────────────────────────────────────────
 
 export function InstructorDashboard() {
-  const { setActiveView } = useUIStore();
+  const { setActiveView, language } = useUIStore();
+  const { t } = useTranslation(language);
   const [uploadTab, setUploadTab] = useState<"file" | "link">("file");
   const [content, setContent] = useState<ContentItem[]>([]);
   const [contentLoading, setContentLoading] = useState(true);
@@ -848,16 +850,16 @@ export function InstructorDashboard() {
   return (
     <section className="space-y-6">
       <SectionHeader
-        description="Manage course materials, upload content, and monitor student progress with real-time feedback tools."
-        eyebrow="COURSE MANAGEMENT"
-        title="Instructor Dashboard"
+        description={t("manageCourse")}
+        eyebrow={t("courseManagement")}
+        title={t("instructorDashboard")}
       />
 
       <div className="grid gap-6 xl:grid-cols-[200px_3fr_2fr]">
         {/* ── CASE SIDEBAR ── */}
         <div className="glass-panel flex flex-col rounded-[28px] p-4">
           <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-sky-300">
-            Хичээлүүд
+            {t("courses")}
           </p>
           <div className="flex flex-col gap-2">
             {STUDY_CASES.map((c) => (
@@ -885,7 +887,7 @@ export function InstructorDashboard() {
               onClick={() => setActiveView("createCourse")}
             >
               <BookPlus className="h-4 w-4" />
-              Шинэ хичээл
+              {t("newCourse")}
             </button>
           </div>
         </div>
@@ -895,7 +897,7 @@ export function InstructorDashboard() {
           <div className="glass-panel rounded-[28px] p-6">
             <div className="flex items-center gap-2">
               <Upload className="size-4 text-sky-300" />
-              <p className="text-sm font-semibold text-slate-100">Course Content Manager</p>
+              <p className="text-sm font-semibold text-slate-100">{t("courseContentManager")}</p>
             </div>
 
             <div className="mt-5 flex gap-1 rounded-2xl border border-white/10 bg-white/5 p-1">
@@ -981,7 +983,7 @@ export function InstructorDashboard() {
           <div className="glass-panel rounded-[28px] p-6">
             <div className="flex items-center gap-2">
               <User className="size-4 text-sky-300" />
-              <p className="text-sm font-semibold text-slate-100">Student Management</p>
+              <p className="text-sm font-semibold text-slate-100">{t("studentManagement")}</p>
             </div>
             <div className="mt-5 space-y-3">
               {MOCK_STUDENTS.map((s) => (

@@ -4,6 +4,8 @@ import { useProgressTracking } from '../../hooks/useProgressTracking';
 import { LiveProgressBar } from '../common/LiveProgressBar';
 import { ChevronDown, ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 import { SectionHeader } from "../common/SectionHeader";
+import { useUIStore } from '../../store/uiStore';
+import { useTranslation } from '../../i18n/useTranslation';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -359,6 +361,9 @@ function CodeBlock({ code, language }: { code: string; language: string }) {
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export function CourseEnvironment() {
+  const { language } = useUIStore();
+  const { t } = useTranslation(language);
+
   const [activePart, setActivePart] = useState(0);
   const [slideIndex, setSlideIndex] = useState(0);
   const [notesOpen, setNotesOpen] = useState(false);
@@ -433,18 +438,18 @@ export function CourseEnvironment() {
             className="rounded-2xl border border-emerald-300/20 bg-emerald-400/10 px-4 py-3 text-sm font-medium text-emerald-100"
             type="button"
           >
-            Start Learning
+            {t("startLearning")}
           </button>
         }
         description="Case 1 — AI for Lunar Formation & Structure. Step through six modular parts covering AI applications in planetary science."
-        eyebrow="Course Environment"
+        eyebrow={t("courseEnvironment")}
         title="AI for Lunar Formation & Structure"
       />
 
       {/* ── Part tabs ─────────────────────────────────────────────────────── */}
       <div className="glass-panel rounded-[28px] p-6">
         <div className="flex flex-wrap gap-2">
-          {PARTS.map((p, i) => (
+          {parts.map((p, i) => (
             <button
               key={p.label}
               type="button"
@@ -466,16 +471,8 @@ export function CourseEnvironment() {
         </p>
 
         {/* ── Progress bar ────────────────────────────────────────────────── */}
-        <div className="mt-4 flex items-center gap-3">
-          <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/10">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-sky-400 to-emerald-400 transition-all duration-300"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-          <span className="shrink-0 text-xs text-slate-400">
-            Slide {slideIndex + 1} of {totalSlides}
-          </span>
+        <div className="mt-4">
+          <LiveProgressBar progress={progress} />
         </div>
 
         {/* ── Slide ───────────────────────────────────────────────────────── */}
@@ -507,7 +504,7 @@ export function CourseEnvironment() {
               <ChevronDown
                 className={`h-3.5 w-3.5 transition-transform ${notesOpen ? "rotate-180" : ""}`}
               />
-              Speaker notes
+              {t("speakerNotes")}
             </button>
             {notesOpen && (
               <p className="mt-3 rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm italic text-slate-400 leading-relaxed">
@@ -526,7 +523,7 @@ export function CourseEnvironment() {
             className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-slate-300 transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
           >
             <ChevronLeft className="h-4 w-4" />
-            Previous
+            {t("previous")}
           </button>
 
           {/* Slide dot indicators */}
@@ -549,7 +546,7 @@ export function CourseEnvironment() {
             disabled={slideIndex === totalSlides - 1}
             className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-slate-300 transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
           >
-            Next
+            {t("next")}
             <ChevronRight className="h-4 w-4" />
           </button>
         </div>
@@ -557,7 +554,7 @@ export function CourseEnvironment() {
 
       {/* ── Practice Exercises ────────────────────────────────────────────── */}
       <div>
-        <p className="mb-5 text-lg font-semibold text-slate-50">Practice Exercises</p>
+        <p className="mb-5 text-lg font-semibold text-slate-50">{t("practiceExercises")}</p>
         <div className="grid gap-4 md:grid-cols-3">
           {EXERCISES.map((ex) => (
             <div
@@ -576,7 +573,7 @@ export function CourseEnvironment() {
                 onClick={() => { window.location.href = ex.path; }}
                 className="inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-slate-200 transition-colors hover:bg-white/10"
               >
-                Open in Virtual Lab
+                {t("openInVirtualLab")}
                 <ExternalLink className="h-4 w-4" />
               </button>
             </div>

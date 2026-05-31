@@ -81,6 +81,27 @@ export const translations = {
     missionControl: "MISSION CONTROL",
     missionControlDesc:
       "Coordinated AI, Jupyter, spatial data, and HPC in one workspace.",
+
+    // CourseEnvironment UI
+    startLearning: "Start Learning",
+    speakerNotes: "Speaker notes",
+    previous: "Previous",
+    next: "Next",
+    practiceExercises: "Practice Exercises",
+    openInVirtualLab: "Open in Virtual Lab",
+
+    // StudentDashboard UI
+    lectureMatarials: "Lecture Materials",
+    submitExercise: "Exercise Submission",
+    markAsDone: "Mark as done",
+    learningProgress: "Learning Progress",
+    nextSteps: "Next Steps",
+    studyCase: "Study Case",
+    lectureContent: "Lecture Content",
+
+    // InstructorDashboard UI
+    courses: "Courses",
+    newCourse: "New Course",
   },
   mn: {
     // Navigation
@@ -164,6 +185,27 @@ export const translations = {
     missionControl: "МИССИЙН УДИРДЛАГА",
     missionControlDesc:
       "AI, Jupyter, орон зайн өгөгдөл болон HPC нэг ажлын орчинд.",
+
+    // CourseEnvironment UI
+    startLearning: "Суралцаж эхлэх",
+    speakerNotes: "Илтгэгчийн тэмдэглэл",
+    previous: "Өмнөх",
+    next: "Дараах",
+    practiceExercises: "Дадлагын дасгалууд",
+    openInVirtualLab: "Виртуал лабид нээх",
+
+    // StudentDashboard UI
+    lectureMatarials: "Лекцийн материал",
+    submitExercise: "Дасгал илгээх",
+    markAsDone: "Дууссан гэж тэмдэглэх",
+    learningProgress: "Суралцахуйн явц",
+    nextSteps: "Дараагийн алхамууд",
+    studyCase: "Судалгааны хичээл",
+    lectureContent: "Лекцийн агуулга",
+
+    // InstructorDashboard UI
+    courses: "Хичээлүүд",
+    newCourse: "Шинэ хичээл",
   },
 };
 
