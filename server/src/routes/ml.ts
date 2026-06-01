@@ -95,11 +95,12 @@ function runScript(
 router.post('/analyze', (req: Request, res: Response) => {
   const {
     algorithm,
-    dataset_url    = '',
-    dataset_base64 = '',
-    target_column  = '',
-    params         = {},
-    engine         = '',
+    dataset_url      = '',
+    dataset_base64   = '',
+    dataset_filename = '',
+    target_column    = '',
+    params           = {},
+    engine           = '',
   } = req.body;
 
   if (!algorithm) {
@@ -114,7 +115,7 @@ router.post('/analyze', (req: Request, res: Response) => {
 
   const payload = JSON.stringify({
     algorithm,
-    params: { dataset_url, dataset_base64, target_column, ...params },
+    params: { dataset_url, dataset_base64, dataset_filename, target_column, ...params },
   });
 
   if (engine === 'bigquery') {
@@ -147,10 +148,11 @@ router.post('/analyze-bigquery', (req: Request, res: Response) => {
 
   const {
     algorithm,
-    dataset_url    = '',
-    dataset_base64 = '',
-    target_column  = '',
-    params         = {},
+    dataset_url      = '',
+    dataset_base64   = '',
+    dataset_filename = '',
+    target_column    = '',
+    params           = {},
   } = req.body;
 
   if (!algorithm) {
@@ -165,7 +167,7 @@ router.post('/analyze-bigquery', (req: Request, res: Response) => {
 
   const payload = JSON.stringify({
     algorithm,
-    params: { dataset_url, dataset_base64, target_column, ...params },
+    params: { dataset_url, dataset_base64, dataset_filename, target_column, ...params },
   });
 
   runScript(BQ_RUNNER, payload, 'BigQuery ML', res);

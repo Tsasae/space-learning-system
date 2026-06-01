@@ -883,6 +883,7 @@ export function LabEditor({ language }: { language: Language }) {
           algorithm: selectedAlgo,
           dataset_url: datasetUrl,
           dataset_base64: datasetBase64,
+          dataset_filename: datasetFileName || '',
           target_column: targetColumn,
           params,
         }),

@@ -1,4 +1,4 @@
-import sys, json, io, base64, os, uuid
+import sys, json, io, base64, os, uuid, zipfile
 import pandas as pd
 import numpy as np
 import joblib
@@ -26,13 +26,56 @@ def save_model(model, feature_names, task_type):
     return model_id
 
 
+def _read_zip(raw):
+    """ZIP доторх эхний CSV-г задалж уншина."""
+    with zipfile.ZipFile(io.BytesIO(raw)) as z:
+        csvs = [n for n in z.namelist() if n.lower().endswith('.csv')]
+        if not csvs:
+            raise ValueError('ZIP дотор CSV файл олдсонгүй')
+        with z.open(csvs[0]) as f:
+            return pd.read_csv(f)
+
+
+def _read_bytes(raw, filename=''):
+    """Bytes-ийг файлын нэр ЭСВЭЛ агуулгын signature-ээр ялгаж уншина."""
+    name = (filename or '').lower()
+    if name.endswith('.zip'):
+        return _read_zip(raw)
+    if name.endswith(('.xlsx', '.xls')):
+        return pd.read_excel(io.BytesIO(raw))
+    if name.endswith('.json'):
+        return pd.read_json(io.BytesIO(raw))
+    if name.endswith('.csv'):
+        return pd.read_csv(io.BytesIO(raw))
+    # Нэр байхгүй бол signature-ээр автомат ялгах
+    if raw[:2] == b'PK':
+        try:
+            with zipfile.ZipFile(io.BytesIO(raw)) as z:
+                if any(n.lower().endswith('.csv') for n in z.namelist()):
+                    return _read_zip(raw)
+        except Exception:
+            pass
+        return pd.read_excel(io.BytesIO(raw))
+    if raw[:2] == b'\xD0\xCF':
+        return pd.read_excel(io.BytesIO(raw))
+    if raw.lstrip()[:1] in (b'{', b'['):
+        return pd.read_json(io.BytesIO(raw))
+    return pd.read_csv(io.BytesIO(raw))
+
+
 def load_data(params):
     url = params.get('dataset_url', '')
     b64 = params.get('dataset_base64', '')
+    filename = params.get('dataset_filename', '')
     if url:
+        u = url.lower()
+        if u.endswith(('.xlsx', '.xls')):
+            return pd.read_excel(url)
+        if u.endswith('.json'):
+            return pd.read_json(url)
         return pd.read_csv(url)
     elif b64:
-        return pd.read_csv(io.BytesIO(base64.b64decode(b64)))
+        return _read_bytes(base64.b64decode(b64), filename)
     else:
         from sklearn.datasets import load_iris
         iris = load_iris()

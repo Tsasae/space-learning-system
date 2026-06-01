@@ -3,3 +3,5 @@ numpy
 scikit-learn
 papermill
 requests
+openpyxl
+xlrd
