@@ -32,7 +32,7 @@ router.get('/students', async (_req: Request, res: Response) => {
       studentsResult.rows.map(async (u) => {
         // Progress
         const progResult = await pool.query(
-          `SELECT COUNT(*) AS completed FROM student_progress WHERE student_id = $1 AND completed = true`,
+          `SELECT COUNT(*) AS completed FROM course_progress WHERE student_id = $1 AND certificate_issued = true`,
           [u.id]
         );
         const completed = Number(progResult.rows[0]?.completed ?? 0);
@@ -182,7 +182,7 @@ router.get('/courses', async (_req: Request, res: Response) => {
   try {
     const result = await pool.query(
       `SELECT c.*,
-        (SELECT COUNT(*) FROM student_progress sp WHERE sp.part_number IS NOT NULL) AS student_count,
+        (SELECT COUNT(DISTINCT cp.student_id) FROM course_progress cp WHERE cp.course_id = c.id) AS student_count,
         0 AS avg_score,
         (SELECT COUNT(*) FROM submissions s WHERE s.exercise_type IS NOT NULL) AS submission_count
        FROM courses c
@@ -266,11 +266,11 @@ router.get('/courses/:id/students', async (req: Request, res: Response) => {
   try {
     const result = await pool.query(
       `SELECT u.id, u.name, u.email,
-              COUNT(sp.id) as completed_parts,
+              COUNT(cp.id) as completed_parts,
               MAX(s.accuracy) as best_accuracy,
               MAX(f.grade) as grade
        FROM users u
-       LEFT JOIN student_progress sp ON sp.student_id = u.id
+       LEFT JOIN course_progress cp ON cp.student_id = u.id::text
        LEFT JOIN submissions s ON s.student_id = u.id
        LEFT JOIN feedback f ON f.student_id = u.id
        WHERE u.role = 'student'
