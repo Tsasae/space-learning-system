@@ -4,6 +4,31 @@ import { Pool } from 'pg';
 const router = Router();
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
+// ── Init tables ────────────────────────────────────────────────────────────────
+pool.query(`
+  CREATE TABLE IF NOT EXISTS submissions (
+    id SERIAL PRIMARY KEY,
+    student_id TEXT NOT NULL,
+    exercise_type TEXT,
+    notebook_content TEXT,
+    result_output TEXT,
+    accuracy DECIMAL(5,2),
+    submitted_at TIMESTAMPTZ DEFAULT NOW()
+  )
+`).catch((err) => console.error('[submissions] table init error:', err));
+
+pool.query(`
+  CREATE TABLE IF NOT EXISTS feedback (
+    id SERIAL PRIMARY KEY,
+    instructor_id INTEGER,
+    student_id TEXT NOT NULL,
+    grade DECIMAL(5,2),
+    comment TEXT,
+    material_id INTEGER,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+  )
+`).catch((err) => console.error('[submissions] feedback table init error:', err));
+
 // Дасгал submit хийх
 router.post('/', async (req: Request, res: Response) => {
   try {
