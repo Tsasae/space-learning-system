@@ -71,64 +71,8 @@ interface DetailStudent {
   submittedAt?: string;
 }
 
-// ─── Mock data ─────────────────────────────────────────────────────────────────
 
 const uid = () => Math.random().toString(36).slice(2, 9);
-
-const MOCK_COURSES: Course[] = [
-  {
-    id: 1, title: "Study Case 1", description: "AI for Lunar Formation & Structure",
-    status: "published", materialCount: 3, partCount: 6, exerciseCount: 3,
-    quizCount: 5, studentCount: 12, avgScore: 87, submissionCount: 8,
-    assignmentName: "NASA NEO Asteroid Classification",
-    dueDate: "2026-06-01", createdAt: "2026-05-06",
-    parts: [
-      { id: "p1", title: "Part 1: Lunar Origin", bullets: ["Giant impact hypothesis", "Accretion theory"], exerciseId: "exercise-crater-cnn" },
-      { id: "p2", title: "Part 2: Surface Evolution", bullets: ["Volcanic activity", "Impact cratering"], exerciseId: "exercise-rf-vs-nn" },
-      { id: "p3", title: "Part 3: Internal Structure", bullets: ["Seismic data", "Core composition"], exerciseId: "exercise-surrogate" },
-    ],
-    quizQuestions: [
-      { id: "q1", type: "multiple", text: "Сарны гадаргуу ямар гарал үүсэлтэй?", options: [{ text: "Giant impact", isCorrect: true }, { text: "Nebular", isCorrect: false }, { text: "Capture", isCorrect: false }] },
-      { id: "q2", type: "short", text: "CNN гэж юу вэ?" },
-      { id: "q3", type: "multiple", text: "Random Forest загварын давуу тал?" },
-      { id: "q4", type: "blank", text: "_____ нь олон шийдвэрийн мод ашигладаг." },
-      { id: "q5", type: "matching", text: "Загваруудыг тайлбартай нь холбоно уу." },
-    ],
-    assignment: { name: "NASA NEO Asteroid Classification", description: "NASA-ийн NEO датасет ашиглан asteroid аюултай эсэхийг ангилах ML загвар боловсруулна уу.", dueDate: "2026-06-01", minAccuracy: 80 },
-    pptFiles: [{ id: "f1", name: "lecture1.pptx", type: "ppt" }, { id: "f2", name: "lunar_data.pptx", type: "ppt" }],
-    pdfFiles: [{ id: "f3", name: "study_guide.pdf", type: "pdf" }],
-    videoFiles: [], links: ["https://nasa.gov/neo"],
-  },
-  {
-    id: 2, title: "Study Case 2", description: "Remote Sensing & Satellite Data",
-    status: "draft", materialCount: 2, partCount: 4, exerciseCount: 2,
-    quizCount: 8, studentCount: 0, avgScore: 0, submissionCount: 0,
-    assignmentName: "Landsat Classification",
-    dueDate: "", createdAt: "2026-05-10",
-    parts: [
-      { id: "p4", title: "Part 1: Satellite Basics", bullets: ["Orbit types", "Sensor types"], exerciseId: "exercise-crater-cnn" },
-      { id: "p5", title: "Part 2: Image Processing", bullets: ["Band combinations", "NDVI"], exerciseId: "" },
-    ],
-    quizQuestions: [],
-    assignment: { name: "Landsat Classification", description: "Landsat-8 хиймэл дагуулын дүрсийг ашиглан газрын бүрхэвчийг ангилна уу.", dueDate: "", minAccuracy: 75 },
-    pptFiles: [{ id: "f4", name: "remote_sensing.pptx", type: "ppt" }],
-    pdfFiles: [{ id: "f5", name: "landsat_guide.pdf", type: "pdf" }],
-    videoFiles: [], links: [],
-  },
-  {
-    id: 3, title: "Study Case 3", description: "HPC Fundamentals",
-    status: "archived", materialCount: 1, partCount: 3, exerciseCount: 1,
-    quizCount: 10, studentCount: 8, avgScore: 79, submissionCount: 7,
-    assignmentName: "SLURM Job Optimization",
-    dueDate: "2026-04-01", createdAt: "2026-04-01",
-    parts: [
-      { id: "p6", title: "Part 1: GPU Architecture", bullets: ["CUDA cores", "Memory hierarchy"], exerciseId: "exercise-surrogate" },
-    ],
-    quizQuestions: [],
-    assignment: { name: "SLURM Job Optimization", description: "HPC кластер дээр SLURM ажлын скриптийг оновчтой болгоно уу.", dueDate: "2026-04-01", minAccuracy: 70 },
-    pptFiles: [], pdfFiles: [], videoFiles: [], links: [],
-  },
-];
 
 const MOCK_DETAIL_STUDENTS: DetailStudent[] = [
   { id: "s1", name: "Цацрал Н.", progress: 100, accuracy: "95.24%", quizScore: "5/5", status: "approved", submissionNotes: "Random Forest + XGBoost ансамбл ашиглав.", submittedAt: "2026-05-18", expanded: false },
@@ -186,7 +130,7 @@ function newQuestion(): QuizQuestion {
 // ─── Status badge ──────────────────────────────────────────────────────────────
 
 function StatusBadge({ status }: { status: CourseStatus }) {
-  const m = STATUS_META[status];
+  const m = STATUS_META[status] ?? STATUS_META.published;
   return (
     <span className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium ${m.badge}`}>
       <span className={`h-1.5 w-1.5 rounded-full ${m.dot}`} />
@@ -368,7 +312,13 @@ function CourseListView({
     const ctrl = new AbortController();
     fetch(`${API_URL}/api/instructor/courses`, { signal: ctrl.signal })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((d) => setCourses(d.courses ?? []))
+      .then((d) => {
+        const list = (d.courses ?? []).map((c: any) => ({
+          ...c,
+          status: c.status ?? (c.published === false ? "draft" : "published"),
+        }));
+        setCourses(list);
+      })
       .catch(() => setCourses([]))
       .finally(() => setLoading(false));
     return () => ctrl.abort();
